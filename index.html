@@ -1997,6 +1997,7 @@ function renderTimeline() {
 let tsOffset = 0;        // 以月为单位的偏移
 const TS_COLS = 16;      // 固定列数：行数按天数推算，网格整体铺满卡片宽度
 function renderTimeGrid() {
+  hideTip();   // 重新绘制时收起悬停提示，避免点击前后月按钮后提示残留在原处
   const now = new Date();
   const start = new Date(now.getFullYear(), now.getMonth() + tsOffset, 1);
   const end = new Date(start.getFullYear(), start.getMonth() + 3, 0);   // 三个月区间的最后一天
