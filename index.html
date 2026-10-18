@@ -207,6 +207,7 @@
 
   .sidebar {
     width: 142px; flex: none; position: sticky; top: 20px;
+    display: flex; flex-direction: column;   /* 便于把底部「使用说明」贴到侧栏最下方 */
     min-height: calc(100vh - 40px);
     background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
     padding: 12px 10px; box-shadow: var(--shadow-sm);
@@ -240,6 +241,8 @@
   .tab:active, .side-btn:active { transform: scale(.97); }
   .tab[disabled], .side-btn[disabled] { opacity: .5; cursor: not-allowed; }
   .side-sep { height: 1px; background: var(--border); margin: var(--sp-3) var(--sp-2) var(--sp-2); }
+  /* 使用说明：贴到侧栏最底部，与上方功能项拉开距离 */
+  #btn-help { margin-top: auto; }
 
   .wrap { flex: 1; min-width: 0; max-width: 1420px; }
 
@@ -953,6 +956,16 @@
   .dp-day.today { border-color: var(--accent-border); color: var(--accent); font-weight: 700; }
   .dp-day.sel { background: var(--accent); color: var(--on-accent); font-weight: 700; border-color: var(--accent); box-shadow: var(--sh-1); }
   .modal-actions { display: flex; align-items: center; gap: 8px; margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border); }
+  /* ============ 使用说明弹窗：正文按小节排布，便于阅读 ============ */
+  .help-section { margin-top: 18px; }
+  .help-section > h3 { display: flex; align-items: center; gap: 8px; font-size: var(--fs-sm); font-weight: 700; color: var(--text); margin-bottom: 9px; }
+  .help-section > h3::before { content: ""; flex: none; width: 3px; height: 13px; border-radius: 2px; background: var(--accent); }
+  .help-list, .help-steps { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 7px; }
+  .help-list li, .help-steps li { font-size: var(--fs-sm); color: var(--text-2); line-height: 1.75; }
+  .help-list li b, .help-steps li b { color: var(--text); font-weight: 600; }
+  .help-warn { color: var(--danger); font-weight: 600; }
+  .help-note { margin: 10px 0 0; padding-left: 20px; font-size: var(--fs-sm); color: var(--text-soft); line-height: 1.7; }
+  .help-tag { display: inline-block; margin-left: 6px; padding: 1px 7px; font-size: var(--fs-2xs); font-weight: 600; color: var(--danger); background: var(--danger-soft); border-radius: var(--r-xs); vertical-align: 1px; }
   .link-danger { color: var(--danger); cursor: pointer; background: none; border: none; font-size: var(--fs-base); font-weight: 500; padding: 8px 10px; border-radius: var(--r-sm); font-family: var(--font); transition: background .15s ease; }
   .link-danger:hover { background: var(--danger-soft); }
 
@@ -1058,10 +1071,11 @@
   }
   @media (max-width: 860px) {
     .shell { flex-direction: column; }
-    .sidebar { width: 100%; position: static; display: flex; align-items: center; gap: 6px; padding: 8px 10px; min-height: 0; border-radius: var(--radius-lg); }
+    .sidebar { width: 100%; position: static; display: flex; flex-direction: row; align-items: center; gap: 6px; padding: 8px 10px; min-height: 0; border-radius: var(--radius-lg); }
     .side-label, .side-sep { display: none; }
     .sidebar > [role="tablist"] { display: flex; align-items: center; gap: 6px; }
     .tab, .side-btn { margin-bottom: 0; width: auto; flex: none; padding: 8px 12px; }
+    #btn-help { margin-top: 0; }
     .tab.active::before, .side-btn.active::before { display: none; }
     .topbar { gap: 10px; }
     .proj-switch { flex: 1; }
@@ -1125,6 +1139,10 @@
     <button type="button" class="side-btn" id="btn-backup-setup">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><ellipse cx="12" cy="6" rx="8" ry="3"/><path d="M4 6v6c0 1.7 3.6 3 8 3s8-1.3 8-3V6"/><path d="M4 12v6c0 1.7 3.6 3 8 3s8-1.3 8-3v-6"/></svg>
       备份设置
+    </button>
+    <button type="button" class="side-btn" id="btn-help" data-tip="数据保存在本机 · 安装到桌面 · 常用操作">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 4.5 1.5c0 1.5-2 2-2 3.2"/><path d="M12 17.2h.01"/></svg>
+      使用说明
     </button>
   </aside>
 
@@ -1318,7 +1336,7 @@ const CORRUPT_KEY = CONFIG.storageKey + ".corrupt";
    items 保证是数组；status / priority 非法回落默认值；created 必须是 YYYY-MM-DD；
    id 缺失补发；active 越界收敛到合法下标 */
 function normalizeData(raw) {
-  if (Array.isArray(raw)) raw = { projects: [{ name: "毕业论文", items: raw }] };
+  if (Array.isArray(raw)) raw = { projects: [{ name: "例-毕业论文", items: raw }] };
   const src = (raw && typeof raw === "object") ? raw : {};
   const statKeys = CONFIG.statuses.map(s => s.key);
   const prioKeys = CONFIG.priorities.map(p => p.key);
@@ -1342,7 +1360,7 @@ function normalizeData(raw) {
       memo: typeof p.memo === "string" ? p.memo : "",
       items: (Array.isArray(p.items) ? p.items : []).map(normItem),
     }));
-  if (!projects.length) projects.push({ id: Date.now(), name: "毕业论文", items: [] });
+  if (!projects.length) projects.push({ id: Date.now(), name: "例-毕业论文", items: [] });
   return {
     schemaVersion: SCHEMA_VERSION,
     active: Math.min(Math.max(0, Number(src.active) || 0), projects.length - 1),
@@ -1366,7 +1384,7 @@ const store = {
         setTimeout(() => toast("本地数据读取失败，已重置为示例数据（原始数据已保留在 " + CORRUPT_KEY + "）"), 0);
       }
     }
-    return normalizeData({ projects: [{ name: "毕业论文", items: structuredClone(CONFIG.seed) }] });
+    return normalizeData({ projects: [{ name: "例-毕业论文", items: structuredClone(CONFIG.seed) }] });
   },
   save(d) {
     try {
@@ -2876,6 +2894,61 @@ function openBackupModal() {
   overlay.querySelector("#bk-restore").onclick = () => { pickFile(); close(); };
 }
 
+/* ---- 使用说明弹窗：数据隔离 + PWA 安装 + 常用操作 ---- */
+function openHelpModal() {
+  if (document.querySelector(".overlay")) return;   /* 已有弹窗时不叠加第二个 */
+  const overlay = document.createElement("div");
+  overlay.className = "overlay";
+  overlay.innerHTML = `<div class="modal" style="width:720px">
+    <button class="modal-x js-x" data-tip="关闭">${X_SVG}</button>
+    <h2>使用说明</h2>
+    <div class="sub">先了解「数据保存在本机」，再按需把本页安装到桌面使用。</div>
+
+    <div class="help-section">
+      <h3>数据保存在本机（重要）</h3>
+      <ul class="help-list">
+        <li>你的任务与备忘录<b>只保存在当前这台设备、当前这个浏览器本地</b>：不上传云端，<b>不与任何人共享，也不会跨设备同步</b>。</li>
+        <li>把链接发给别人，对方打开看到的是<b>一份空白看板</b>；你记录的内容对方看不到，对方记录的你也看不到。</li>
+        <li>换浏览器、换电脑 / 手机打开本页，同样是空白，数据不会跟过去。</li>
+        <li><span class="help-warn">清理浏览器数据、使用无痕模式，或卸载已安装的应用，会导致数据永久丢失且无法找回。</span></li>
+        <li>转移或备份数据：左侧栏「<b>备份设置</b>」→「导出备份」得到文件；在另一台设备「备份设置」里<b>拖入或粘贴</b>该文件即可恢复。建议定期导出备份。</li>
+      </ul>
+    </div>
+
+    <div class="help-section">
+      <h3>安装到桌面（PWA）</h3>
+      <ol class="help-steps">
+        <li><b>电脑（Chrome / Edge）</b>：用 Chrome 或 Edge 打开本页 → 地址栏右侧出现「安装」图标（或浏览器菜单里「安装进度看板 / 将此站点作为应用安装」）→ 点「安装」→ 桌面 / 开始菜单出现图标。</li>
+        <li>安装后以<b>独立窗口</b>打开、没有地址栏，并可离线使用。</li>
+        <li><b>安卓 Chrome</b>：打开本页 → 右上角菜单 <b>⋮</b> →「安装应用」或「添加到主屏幕」。</li>
+        <li><b>iPhone / iPad（Safari）</b>：打开本页 → 底部「分享」→「添加到主屏幕」。</li>
+      </ol>
+      <p class="help-note">手机 / 平板<span class="help-tag">不建议使用</span>：本工具界面按桌面宽屏设计，小屏操作体验较差，建议在电脑上使用。</p>
+      <p class="help-note">提示：安装前需先用浏览器联网打开本页一次，之后才能离线使用。</p>
+    </div>
+
+    <div class="help-section">
+      <h3>常用操作</h3>
+      <ul class="help-list">
+        <li><b>新建任务</b>：点筛选栏右侧的蓝色「新建任务」。</li>
+        <li><b>切换视图</b>：点左侧栏「任务列表 / 看板视图 / 时间轴」。</li>
+        <li><b>推进状态</b>：点任务卡片上的状态标签，按「待开始 → 进行中 → 已完成」依次推进。</li>
+        <li><b>键盘操作</b>（窗口获得焦点时）：Enter / 空格 打开任务；Delete 删除；Alt + ↑ / ↓ 调整顺序；Esc 关闭弹窗。</li>
+      </ul>
+    </div>
+
+    <div class="modal-actions">
+      <div class="spacer"></div>
+      <button class="btn" id="help-ok">知道了</button>
+    </div></div>`;
+  document.body.appendChild(overlay);
+
+  const close = () => overlay.remove();
+  overlay.onclick = e => { if (e.target === overlay) close(); };
+  overlay.querySelectorAll(".js-x").forEach(b => b.onclick = close);
+  overlay.querySelector("#help-ok").onclick = close;
+}
+
 function restoreBackup(file) {
   const reader = new FileReader();
   reader.onerror = () => toast("恢复失败：文件读取失败");
@@ -3253,6 +3326,7 @@ $("#search").oninput = () => {
 $("#btn-new").onclick = () => openModal(null);
 $("#btn-import").onclick = openImportModal;
 $("#btn-backup-setup").onclick = openBackupModal;
+$("#btn-help").onclick = openHelpModal;
 
 $("#btn-collapse").onclick = () => {
   const names = [...new Set(filtered().map(i => i.line || "未分类"))];
