@@ -9,6 +9,24 @@
   /* 提前应用明暗模式，避免刷新时先闪一下亮色 */
   try { if (localStorage.getItem("lunwen-theme") === "dark") document.documentElement.dataset.theme = "dark"; } catch (e) {}
 </script>
+<script>
+  /* PWA：只在通过 http(s) 网址访问时挂 manifest 与 Service Worker，从而可以「安装」成应用。
+     用 file:// 本地打开时不注入任何外链，保持单文件可离线使用。 */
+  (function () {
+    if (location.protocol !== "http:" && location.protocol !== "https:") return;
+    const head = (tag, attrs) => {
+      const el = document.createElement(tag);
+      for (const k in attrs) el.setAttribute(k, attrs[k]);
+      document.head.appendChild(el);
+    };
+    head("link", { rel: "manifest", href: "./manifest.json" });
+    head("link", { rel: "apple-touch-icon", href: "./icon-192.png" });
+    head("meta", { name: "theme-color", content: "#4b63ff" });
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => { navigator.serviceWorker.register("./sw.js").catch(() => {}); });
+    }
+  })();
+</script>
 <style>
   /* ============================================================
      DESIGN SYSTEM — 信息优先的工具型台账
@@ -971,17 +989,17 @@
 
   /* 备份设置面板：拖拽区 + 存储位置信息 */
   /* 面板做成定高的弹性列：固定部分尽量薄，中间拖拽区吃掉约七成高度 */
-  .modal.bk-modal { display: flex; flex-direction: column; height: min(660px, 86vh); padding: 16px; }
+  .modal.bk-modal { display: flex; flex-direction: column; height: min(480px, 74vh); padding: 14px; }
   .modal.bk-modal > h2,
   .modal.bk-modal > .sub,
   .modal.bk-modal > .bk-store,
   .modal.bk-modal > .modal-actions { flex: none; }
-  .modal.bk-modal > .sub { margin-bottom: 10px; }
-  .modal.bk-modal > .modal-actions { margin-top: 10px; padding-top: 10px; }
+  .modal.bk-modal > .sub { margin-bottom: 8px; }
+  .modal.bk-modal > .modal-actions { margin-top: 8px; padding-top: 8px; }
   .modal.bk-modal > .bk-drop { flex: 1 1 auto; }
   .bk-drop {
     display: flex; flex-direction: column; gap: 4px; align-items: center; justify-content: center;
-    text-align: center; min-height: 120px;
+    text-align: center; min-height: 80px;
     padding: 16px 14px; margin-bottom: 8px; cursor: pointer;
     border: 1.5px dashed var(--border-strong); border-radius: var(--r-lg);
     background: var(--surface-2); color: var(--text-soft);
@@ -2785,7 +2803,7 @@ function openBackupModal() {
   const proj = activeProject();
   const overlay = document.createElement("div");
   overlay.className = "overlay";
-  overlay.innerHTML = `<div class="modal bk-modal" style="width:440px">
+  overlay.innerHTML = `<div class="modal bk-modal" style="width:480px">
     <button class="modal-x js-x" data-tip="关闭">${X_SVG}</button>
     <h2>备份设置</h2>
     <div class="sub">当前项目「${esc(proj.name)}」共 <b>${proj.items.length}</b> 条任务。</div>
