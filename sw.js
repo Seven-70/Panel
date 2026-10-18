@@ -2,7 +2,7 @@
    作用：让应用可安装、首次打开后离线可用。
    策略：页面请求走「网络优先、失败回退缓存」，这样每次更新都能拿到新版本；
        图标与 manifest 走「缓存优先」，加快二次打开。 */
-const CACHE = "panel-shell-v1";
+const CACHE = "panel-shell-v2";
 const SHELL = ["./", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {
@@ -33,8 +33,10 @@ self.addEventListener("fetch", e => {
     e.respondWith(
       fetch(req)
         .then(res => {
-          const copy = res.clone();
-          caches.open(CACHE).then(c => c.put(req, copy));
+          if (res.ok) {                       /* 只缓存成功响应，避免把 404 存进缓存 */
+            const copy = res.clone();
+            caches.open(CACHE).then(c => c.put(req, copy));
+          }
           return res;
         })
         .catch(() => caches.match(req).then(r => r || caches.match("./")))
@@ -44,8 +46,10 @@ self.addEventListener("fetch", e => {
 
   e.respondWith(
     caches.match(req).then(r => r || fetch(req).then(res => {
-      const copy = res.clone();
-      caches.open(CACHE).then(c => c.put(req, copy));
+      if (res.ok) {
+        const copy = res.clone();
+        caches.open(CACHE).then(c => c.put(req, copy));
+      }
       return res;
     }))
   );
