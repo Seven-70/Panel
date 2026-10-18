@@ -502,7 +502,7 @@
     box-shadow: var(--shadow-md);
   }
 
-  /* 距离下次任务倒计时（居中单条显示，所有状态统一固定高度 40px） */
+  /* 距离最近任务倒计时（居中单条显示，所有状态统一固定高度 40px） */
   .cd-box, .cd-box.is-empty {
     display: flex; flex-direction: column; align-items: center; justify-content: center;
     gap: 1px; text-align: center;
@@ -557,13 +557,18 @@
   .memo-foot .btn.ghost { padding: 5px 12px; font-size: var(--fs-xs); }
   .ring-wrap { position: relative; width: 220px; height: 220px; flex: none; }
   .ring-wrap svg { display: block; }
-  #ring-segs { filter: drop-shadow(var(--sh-drop)); }
+  /* 圆环本身不再投影：3D 立体感由厚度层与倒角承担，避免下方出现黑影 */
   .ring-seg-g {
     cursor: pointer; transition: transform .28s var(--ease);
     transform-box: view-box; transform-origin: 110px 110px;
   }
   .ring-seg-g:hover { transform: scale(1.06); }
-  .ring-seg { transition: filter .2s ease; }
+  /* 扇区可键盘聚焦，但鼠标点击时不要浏览器默认的聚焦方框；仅键盘聚焦用提亮做提示 */
+  .ring-seg-g:focus { outline: none; }
+  .ring-seg-g:focus-visible { outline: none; }
+  .ring-seg-g:focus-visible .ring-seg { filter: brightness(1.12) saturate(1.08); }
+  /* 扇区之间用卡片底色描边，浅色下像白缝、深色下像真缝隙（跟随主题） */
+  .ring-seg { transition: filter .2s ease; stroke: var(--surface); stroke-width: 1; stroke-linejoin: round; }
   .ring-seg-g:hover .ring-seg { filter: brightness(1.07) saturate(1.06); }
   .ring-lbl {
     font-family: var(--font); font-weight: 700;
@@ -583,6 +588,9 @@
     transition: background var(--dur-2) var(--ease);
   }
   .ring-center:hover { background: color-mix(in srgb, var(--accent) 6%, transparent); }
+  /* 中心按钮同理：鼠标点击不出聚焦方框，键盘聚焦用底色提示 */
+  .ring-center:focus { outline: none; }
+  .ring-center:focus-visible { outline: none; background: color-mix(in srgb, var(--accent) 12%, transparent); }
   .ring-pct { font-family: var(--font-mono); font-size: var(--fs-xl); font-weight: 700; letter-spacing: -.04em; color: var(--text); font-variant-numeric: tabular-nums; line-height: 1.1; }
   /* 统计区：标题做小字号字距标签，行内数值走等宽，扫读更稳 */
   .ring-label { font-size: var(--fs-2xs); color: var(--text-soft); letter-spacing: .08em; font-weight: 600; }
@@ -1526,7 +1534,19 @@ function renderNote() {
   }
 }
 
-/* interactive donut ring — multi-segment, each segment labelled with % + lead line */
+/* 颜色混合：把 hex 朝目标色靠拢 t（用于 3D 圆环的侧壁暗部与顶面高光） */
+function mixHex(hex, other, t) {
+  const toRgb = s => {
+    const v = String(s).replace("#", "");
+    const n = v.length === 3 ? v.split("").map(c => c + c).join("") : v;
+    return [parseInt(n.slice(0, 2), 16) || 0, parseInt(n.slice(2, 4), 16) || 0, parseInt(n.slice(4, 6), 16) || 0];
+  };
+  const a = toRgb(hex), b = toRgb(other);
+  const m = i => Math.round(a[i] + (b[i] - a[i]) * t).toString(16).padStart(2, "0");
+  return `#${m(0)}${m(1)}${m(2)}`;
+}
+
+/* interactive donut ring — 3D：底面挤出层（厚度）+ 顶面受光渐变 + 内外圈倒角 */
 function renderRing() {
   const all = items();
   const total = all.length;
@@ -1547,8 +1567,9 @@ function renderRing() {
     row.classList.toggle("active", isAll ? fStatus === "" : fStatus === row.dataset.key);
   });
 
-  /* ---- donut chart: annular slices, soft gradients, hover scale, adaptive labels ---- */
-  const CX = 110, CY = 110, R_OUT = 88, R_IN = 52;   // thick donut band
+  /* ---- donut：受光顶面 + 内外圈倒角（平面圆环，无厚度层） ---- */
+  const CX = 110, CY = 110, R_OUT = 88, R_IN = 52;   // 外 / 内半径
+  const DARK = "#0a1120", LIGHT = "#ffffff";        // 顶面暗部 / 高光的目标色
   const segsG = $("#ring-segs");
   const leadsG = $("#ring-leads");
   const order = ["done", "doing", "revise", "todo"];
@@ -1566,7 +1587,9 @@ function renderRing() {
   };
 
   if (!parts.length) {
-    segsG.innerHTML = `<path d="${arcPath(-Math.PI / 2, Math.PI * 1.5, R_OUT, R_IN)}" fill="${CONFIG.statuses[0].color}" opacity=".18"/>`;
+    const c = CONFIG.statuses[0].accent;
+    segsG.innerHTML = `<circle cx="${CX}" cy="${CY}" r="${R_OUT}" style="fill: var(--surface-2)"/>
+      <path d="${arcPath(-Math.PI / 2, Math.PI * 1.5, R_OUT, R_IN)}" fill="${c}" opacity=".18"/>`;
     leadsG.innerHTML = "";
     return;
   }
@@ -1586,10 +1609,11 @@ function renderRing() {
     const mid = angle + span / 2;
     const pctStr = Math.round(frac * 100);
 
-    // soft gradient like the reference (light at one end)
-    defsHTML.push(`<linearGradient id="segGrad${i}" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="${p.s.accent}" stop-opacity="1"/>
-      <stop offset="100%" stop-color="${p.s.accent}" stop-opacity=".7"/>
+    // 顶面：左上受光高光 → 本色 → 右下暗部，做出球面受光感
+    defsHTML.push(`<linearGradient id="segTop${i}" x1="8%" y1="0%" x2="88%" y2="104%">
+      <stop offset="0%" stop-color="${mixHex(p.s.accent, LIGHT, .40)}"/>
+      <stop offset="46%" stop-color="${p.s.accent}"/>
+      <stop offset="100%" stop-color="${mixHex(p.s.accent, DARK, .26)}"/>
     </linearGradient>`);
 
     // % + name on the band — narrow readable font range, clear gap between the two lines
@@ -1608,16 +1632,17 @@ function renderRing() {
     }
 
     segHTML.push(`<g class="ring-seg-g" data-key="${p.k}" data-tip="${p.s.label} ${p.n} 项 · ${pctStr}%">
-      <path class="ring-seg" d="${arcPath(a0, safeA1, R_OUT, R_IN)}" fill="url(#segGrad${i})"></path>
+      <path class="ring-seg" d="${arcPath(a0, safeA1, R_OUT, R_IN)}" fill="url(#segTop${i})"></path>
       ${labelHTML}
     </g>`);
 
     angle += span;
   });
 
-  // base disc fills the hole and under the band — center + ring read as one solid coin
+  // 底色圆盘填住孔洞与环下区域；分隔感交给扇区自身的白边，不再额外画倒角描边
   segsG.innerHTML = `<defs>${defsHTML.join("")}</defs>
-    <circle cx="${CX}" cy="${CY}" r="${R_OUT}" style="fill: var(--surface-2)"/>` + segHTML.join("");
+    <circle cx="${CX}" cy="${CY}" r="${R_OUT}" style="fill: var(--surface-2)"/>
+    ${segHTML.join("")}`;
   leadsG.innerHTML = "";
 
   /* 环形图扇区：鼠标点击与键盘 Enter/Space 都能筛选状态；对读屏暴露为带标签的按钮 */
@@ -3006,6 +3031,7 @@ const daysFromToday = ds => Math.round((new Date(ds) - new Date(todayStr())) / 8
 /* 自定义悬停提示：鼠标跟随显示，键盘聚焦同样能触发，读屏通过 aria-describedby 关联 */
 let tipEl = null;
 let tipAnchor = null;
+let suppressTip = false;   // 弹窗关闭「还焦点」期间屏蔽提示，避免残留一个停在原处的小弹窗
 function ensureTip() {
   if (!tipEl) {
     tipEl = document.createElement("div");
@@ -3022,7 +3048,9 @@ function showTip(text, x, y) {
   el.style.display = "block";
   const r = el.getBoundingClientRect();
   const left = Math.max(6, Math.min(x - r.width / 2, window.innerWidth - r.width - 6));
-  const top = y - r.height - 10 < 6 ? y + 16 : y - r.height - 10;
+  /* 默认贴在指针下方：不遮挡正在看的内容；下方空间不够时才翻到上方 */
+  const below = y + 18;
+  const top = below + r.height > window.innerHeight - 6 ? Math.max(6, y - r.height - 10) : below;
   el.style.left = `${left}px`;
   el.style.top = `${top}px`;
 }
@@ -3038,7 +3066,7 @@ function showTipFor(el) {
   tipAnchor = el;
   el.setAttribute("aria-describedby", "app-tip");
   const r = el.getBoundingClientRect();
-  showTip(text, r.left + r.width / 2, r.top);
+  showTip(text, r.left + r.width / 2, r.bottom);   // 传元素下边缘，提示落在元素下方
 }
 
 /* 全局统一悬停提示：所有 data-tip 元素共用日历同款的提示样式。
@@ -3066,6 +3094,8 @@ document.addEventListener("mouseleave", hideTip);
 window.addEventListener("blur", hideTip);
 /* 键盘路径：聚焦带提示的元素时显示，失焦隐藏 */
 document.addEventListener("focusin", e => {
+  /* 弹窗关闭把焦点还给来源元素时，跳过这次提示并收起已有的，避免留下一个「停在原处」的小弹窗 */
+  if (suppressTip) { suppressTip = false; hideTip(); return; }
   const el = e.target instanceof Element ? e.target.closest("[data-tip]") : null;
   if (el) showTipFor(el); else hideTip();
 });
@@ -3133,14 +3163,16 @@ const dialogObserver = new MutationObserver(muts => {
        否则用户再按一次回车就会重新激活来源按钮、把同一个弹窗又打开。 */
     if (entry && n.dataset.noRefocus !== "1" && entry.prev && document.contains(entry.prev) && typeof entry.prev.focus === "function"
         && (document.activeElement === document.body || document.activeElement === null)) {
+      suppressTip = true;   /* 这次「还焦点」不弹提示，避免残留小弹窗 */
       try { entry.prev.focus({ preventScroll: true }); } catch (e) {}
+      suppressTip = false;
     }
   }));
 });
 dialogObserver.observe(document.body, { childList: true });
 
-/* 距离下次任务倒计时
-   - 默认：按截止时间升序，显示最近一个未完成任务
+/* 距离最近任务倒计时
+   - 默认：按截止时间升序，显示「日期最近」的那个任务（不限状态，已完成也参与）
    - 点击日历某个日期后：自动切换为距离该日期还有多少天，再点一次取消选中
    所有状态统一为「数字+标题 / 副标题」两行结构，固定高度不随内容变化 */
 function renderCountdown() {
@@ -3168,19 +3200,19 @@ function renderCountdown() {
     return;
   }
 
-  // 默认：按时间排序，显示最近一个未完成任务的倒计时
+  // 默认：按截止日期升序，取「日期最近」的那个任务（不限状态，已完成也参与，不再被跳过）
   const upcoming = items()
-    .filter(i => i.status !== "done" && /^\d{4}-\d{2}-\d{2}$/.test(String(i.created || "")) && String(i.created) >= today)
+    .filter(i => /^\d{4}-\d{2}-\d{2}$/.test(String(i.created || "")) && String(i.created) >= today)
     .sort((a, b) => String(a.created).localeCompare(String(b.created)));
   if (!upcoming.length) {
-    fill("", "暂无待办任务", "没有设置了日期的未完成任务", true);
+    fill("", "暂无任务", "没有设置了日期的任务", true);
     return;
   }
   const next = upcoming[0];
   const diff = diffDays(next.created);
   fill(
     diff === 0 ? "今天" : diff,
-    diff === 0 ? "有任务截止" : "天后 · 距下次任务",
+    diff === 0 ? "有任务截止" : "天后 · 距最近任务",
     `${next.name} · ${next.created.slice(5).replace("-", "/")}`,
     false
   );
