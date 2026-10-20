@@ -1,8 +1,9 @@
 /* 进度看板 · Service Worker
    作用：让应用可安装、首次打开后离线可用。
    策略：页面请求走「网络优先、失败回退缓存」，这样每次更新都能拿到新版本；
-       图标与 manifest 走「缓存优先」，加快二次打开。 */
-const CACHE = "panel-shell-v2";
+       图标与 manifest 走「缓存优先」，加快二次打开 —— 所以这两类文件有改动时，
+       必须提下面的 CACHE 版本号，否则老用户拿到的还是旧图标。 */
+const CACHE = "panel-shell-v3";
 const SHELL = ["./", "./manifest.json", "./icon-192.png", "./icon-512.png"];
 
 self.addEventListener("install", e => {

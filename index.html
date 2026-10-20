@@ -21,6 +21,7 @@
       document.head.appendChild(el);
     };
     head("link", { rel: "manifest", href: "./manifest.json" });
+    head("link", { rel: "icon", type: "image/png", href: "./icon-192.png" });
     head("link", { rel: "apple-touch-icon", href: "./icon-192.png" });
     head("meta", { name: "theme-color", content: "#0a0e14" });
     if ("serviceWorker" in navigator) {
@@ -34,79 +35,72 @@
      冷调中性灰阶（Charcoal / Slate / Light Gray / White）+ 炭灰强调 + 单一无衬线；层级由字体 / 间距 / 阴影承担
      ============================================================ */
   :root {
-    /* ---- 中性色阶：冷调中性灰 / 石板灰阶
-       Modern Minimalist 四色基底：Charcoal #36454f → Slate Gray #708090 → Light Gray #d3d3d3 → White #ffffff ---- */
-    --n-0: #ffffff;  --n-25: #fafbfc;  --n-50: #f4f5f7;  --n-100: #eceef1;
-    --n-150: #e3e6ea; --n-200: #d3d3d3; --n-300: #bcc2c9; --n-400: #9aa3ad;
-    --n-500: #708090; --n-600: #5a6672; --n-700: #46525d; --n-800: #36454f; --n-900: #232d35;
+    /* ---- 语义色（浅色 · Linear 设计语言）----
+       平面层级：页面 --bg（画布）< 容器/列 --surface（surface-1）< 卡片 --surface-2（surface-2）< 浮层 --surface-3
+       Linear 不靠投影拉层级，而是靠「画布色阶 + 1px 发丝描边」分档；
+       浮层一律用实底，避免背后正文透形；
+       Linear 无装饰渐变，故 --bg-image 置空。
+       注意：修改底色时务必同步 :root[data-theme="dark"] 里的对应变量，两档要保持同一套语义。 */
+    --bg: #f7f8f8;
+    --bg-image: none;
+    --surface: #ffffff;
+    --surface-2: #f5f6f6;
+    --surface-3: #ffffff;
+    --border: #e6e7e9;
+    --border-strong: #d7d9dd;
+    --border-hover: #c3c6cb;
+    --text: #0b0c0e;
+    --text-2: #3e4249;
+    --text-3: #6b7076;
+    --text-soft: #8a8f98;
+    --placeholder: #8a8f98;
+    --cal-muted: rgba(0, 0, 0, .22);
+    --scroll-thumb: rgba(0, 0, 0, .18);
+    --scroll-thumb-hover: rgba(0, 0, 0, .34);
 
-    /* ---- 语义色（浅色 · 玻璃）----
-       平面层级：页面（固定光斑背景）< 容器/列 --surface（半透明玻璃）< 卡片 --surface-2（更亮的玻璃顶面）
-       面板一律为半透明白，叠加 backdrop-filter 模糊其后内容形成磨砂玻璃；
-       --bg 为不透明兜底色（作为背景垫层与混色基色），--bg-image 为固定的多层光斑渐变 */
-    --bg: #e9edf4;
-    --bg-image:
-      radial-gradient(1100px 780px at 10% -12%, rgba(255, 255, 255, .92), transparent 62%),
-      radial-gradient(1000px 720px at 92% 0%, rgba(120, 130, 142, .14), transparent 64%),
-      radial-gradient(1200px 900px at 48% 116%, rgba(255, 255, 255, .72), transparent 62%);
-    --surface: rgba(255, 255, 255, .55);
-    --surface-2: rgba(255, 255, 255, .72);
-    --surface-3: rgba(255, 255, 255, .88);
-    --border: rgba(54, 69, 79, .13);
-    --border-strong: rgba(54, 69, 79, .20);
-    --border-hover: rgba(54, 69, 79, .32);
-    --text: #1b2430;
-    --text-2: #566476;
-    --text-3: #7b8798;
-    --text-soft: #97a1b0;
-    --placeholder: #97a1b0;
-    --cal-muted: rgba(54, 69, 79, .28);
-    --scroll-thumb: rgba(54, 69, 79, .22);
-    --scroll-thumb-hover: rgba(54, 69, 79, .38);
-
-    /* ---- 强调色：玻璃主题去蓝，改为中性石板色（既作按钮实心，也作文字 / 描边前景） ---- */
-    --accent: #3f4a56;
-    --accent-hover: #333c47;
-    --accent-active: #262e36;
-    --accent-soft: rgba(63, 74, 86, .10);
-    --accent-soft-2: rgba(63, 74, 86, .16);
-    --accent-border: rgba(63, 74, 86, .30);
-    --accent-ring: rgba(63, 74, 86, .26);
+    /* ---- 强调色：Linear 薰衣草蓝 #5e6ad2
+       全站唯一彩色强调，只出现在主操作、焦点环、品牌标记与链接强调上，绝不做底色或卡片填充 ---- */
+    --accent: #5e6ad2;
+    --accent-hover: #4f59c2;   /* 浅底上的悬停：压深一档，保证与白底的对比 */
+    --accent-active: #444db0;  /* 按下态：再深一档 */
+    --accent-soft: rgba(94, 106, 210, .10);
+    --accent-border: rgba(94, 106, 210, .34);
+    --accent-ring: rgba(94, 106, 210, .26);
     --on-accent: #ffffff;
 
-    /* ---- 危险色：保留红色语义，去饱和 ---- */
-    --danger: #dc5b52;
-    --danger-hover: #c2453d;
-    --danger-soft: rgba(220, 91, 82, .12);
-    --danger-border: rgba(220, 91, 82, .30);
+    /* ---- 危险色（浅色档） ---- */
+    --danger: #e5484d;
+    --danger-hover: #d63c41;
+    --danger-soft: rgba(229, 72, 77, .10);
 
-    /* ---- 状态语义色：环形图与统计行的唯一色源（重规划：石板灰 / 蓝 / 橙 / 青绿；蓝仅保留在状态体系内） ---- */
-    --st-todo: #94a3b8;
-    --st-doing: #3b82f6;
-    --st-revise: #f97316;
-    --st-done: #10b981;
+    /* ---- 状态语义色：灰 / 薰衣草 / 橙 / 绿，环形图与统计行的唯一色源 ---- */
+    --st-todo: #8a8f98;
+    --st-doing: #5e6ad2;
+    --st-revise: #f2994a;
+    --st-done: #27a644;
 
-    /* ---- 浮层 / 提示 ---- */
-    --overlay: rgba(27, 36, 48, .28);
-    --toast-bg: rgba(27, 36, 48, .88);
-    --toast-fg: #f5f7fa;
-    --toast-ok: #34b06a;
+    /* ---- 浮层 / 提示：一律实底 ---- */
+    --overlay: rgba(0, 0, 0, .32);
+    --toast-bg: #0f1011;
+    --toast-fg: #f7f8f8;
+    --toast-ok: #27a644;
 
-    /* ---- 圆角阶：极简体系（4 / 6 / 8 / 12 / 16），克制的圆角，保持干净轮廓 ---- */
+    /* ---- 圆角阶：Linear 的圆角语法（4 / 6 / 8 / 12 / 16）
+       按钮与输入框固定用 8px，卡片用 12px，面板用 16px —— Linear 从不给 CTA 用满圆角 ---- */
     --r-xs: 4px;  --r-sm: 6px;  --r-md: 8px;  --r-lg: 12px;  --r-xl: 16px;  --r-full: 999px;
     /* 兼容旧名，逐步收敛 */
     --radius-lg: var(--r-xl);
     --radius: var(--r-lg);
     --radius-sm: var(--r-md);
 
-    /* ---- 间距阶：4px 基准，对应 Radix Themes 的 space 1→9（6 / 20 为半档补充，9→11 为区块级间距） ---- */
-    --sp-1: 4px; --sp-2: 6px; --sp-3: 8px; --sp-4: 12px;
-    --sp-5: 16px; --sp-6: 20px; --sp-7: 24px; --sp-8: 32px;
-    --sp-9: 40px; --sp-10: 48px; --sp-11: 64px;
+    /* ---- 间距阶：4px 基准，只保留实际在用的档位（6 / 20 为半档补充，48 / 64 为区块级间距） ---- */
+    --sp-2: 6px; --sp-3: 8px; --sp-4: 12px;
+    --sp-5: 16px; --sp-6: 20px; --sp-7: 24px;
+    --sp-10: 48px; --sp-11: 64px;
 
     /* ---- 字号阶（7 步正文阶 + 1 步展示级；多处容器为固定高度，不可随意改动） ---- */
     --fs-2xs: 10.5px; --fs-xs: 11.5px; --fs-sm: 12.5px; --fs-base: 13.5px;
-    --fs-md: 15px; --fs-lg: 17px; --fs-xl: 22px; --fs-2xl: 26px;
+    --fs-md: 15px; --fs-lg: 17px; --fs-xl: 21px; --fs-2xl: 28px;
 
     /* ---- 行高阶：随字号联动，只保留 5 档，避免同一角色出现 1.4 / 1.45 / 1.5 各写一遍 ----
        none 单行控件 · tight 大标题 · snug 卡片标题 · base 正文 · relaxed 说明段落
@@ -117,30 +111,24 @@
        tight 大标题与大数字 · snug 小标题 · flat 正文与卡片标题 · chip 徽标与计数 · caps 分区小标签 */
     --ls-tight: -.02em; --ls-snug: -.01em; --ls-flat: 0; --ls-chip: .02em; --ls-caps: .08em;
 
-    /* ---- 字重阶：只保留四档，正文 regular、控件 medium/semibold、标题与强调 bold ---- */
-    --fw-regular: 400; --fw-medium: 500; --fw-semibold: 600; --fw-bold: 700;
+    /* ---- 字重阶：Linear 的阶梯是 400 / 500 / 600（Linear 刻意回避 700+ 的展示字重） ---- */
+    --fw-regular: 400; --fw-medium: 500; --fw-semibold: 600; --fw-bold: 600;
 
-    /* ---- 阴影阶：玻璃面板用更柔和、更弥散的投影，避免在光斑背景上显脏 ---- */
-    --sh-1: 0 1px 2px rgba(27, 36, 48, .07);
-    --sh-2: 0 2px 6px -2px rgba(27, 36, 48, .10), 0 8px 22px -8px rgba(27, 36, 48, .12);
-    --sh-3: 0 4px 10px -4px rgba(27, 36, 48, .12), 0 16px 40px -12px rgba(27, 36, 48, .16);
-    --sh-4: 0 6px 16px -6px rgba(27, 36, 48, .14), 0 26px 60px -20px rgba(27, 36, 48, .22);
-    --sh-5: 0 10px 24px -8px rgba(27, 36, 48, .16), 0 36px 80px -26px rgba(27, 36, 48, .26);
-    --sh-drop: 0 4px 14px rgba(27, 36, 48, .16);
-    --ring-stroke: rgba(27, 36, 48, .14);
+    /* ---- 阴影阶：Linear 靠画布色阶与 1px 发丝描边拉层级，几乎不用投影；
+       仅真正浮在正文之上的弹层（大面板 / 下拉 / 弹窗）保留一层克制的漫射投影 ---- */
+    --sh-1: none;
+    --sh-2: 0 1px 1px rgba(0, 0, 0, .04);
+    --sh-3: 0 2px 6px rgba(0, 0, 0, .06);
+    --sh-4: 0 6px 16px rgba(0, 0, 0, .10);
+    --sh-5: 0 12px 32px rgba(0, 0, 0, .14);
+    --ring-stroke: rgba(0, 0, 0, .08);
     --shadow-xs: var(--sh-1);
     --shadow-sm: var(--sh-2);
     --shadow-md: var(--sh-3);
-    /* ---- 顶栏（浮动玻璃药丸）----
-       半透明白底 + 顶沿一道内高光，配合 backdrop-filter 模糊其后内容形成磨砂玻璃 */
-    --nav-bg: rgba(255, 255, 255, .62);
-    --nav-border: rgba(54, 69, 79, .12);
-    --nav-hover: rgba(255, 255, 255, .85);
-    --nav-shadow:
-      0 1px 1px rgba(27, 36, 48, .04),
-      0 12px 26px -14px rgba(27, 36, 48, .20),
-      0 34px 64px -32px rgba(27, 36, 48, .24),
-      inset 0 1px 0 rgba(255, 255, 255, .95);
+    /* ---- 顶栏：Linear top-nav（画布色半透明 + 轻微模糊），底沿一道发丝线收边 ---- */
+    --nav-bg: color-mix(in srgb, #ffffff 88%, transparent);
+    --nav-border: #e6e7e9;
+    --nav-hover: rgba(0, 0, 0, .055);
 
     /* ---- 动效 ---- */
     --dur-1: 120ms; --dur-2: 180ms; --dur-3: 240ms; --dur-4: 400ms;
@@ -224,8 +212,6 @@
   }
   .bi-calendar3::before { content: "\f214"; }
   .bi-check-circle::before { content: "\f26b"; }
-  .bi-check-lg::before { content: "\f633"; }
-  .bi-chevron-down::before { content: "\f282"; }
   .bi-chevron-right::before { content: "\f285"; }
   .bi-clock-history::before { content: "\f292"; }
   .bi-database::before { content: "\f8c4"; }
@@ -245,77 +231,65 @@
   .bi-trash3::before { content: "\f78b"; }
   .bi-x-lg::before { content: "\f659"; }
   .bi-upload::before { content: "\f603"; }
-  /* ============ 明暗模式：深色主题覆盖上面的设计变量（深色玻璃：深墨底 + 中性白灰光斑 + 半透明磨砂面板）============ */
+  /* ============ 明暗模式：深色主题 = Linear 深色版（近黑画布 #010102 + 四级表面阶梯）============ */
   :root[data-theme="dark"] {
-    --bg: #0a0e14;
-    /* 深色下的多层柔光斑：中性白 / 浅灰（去蓝），固定铺满视口，透出玻璃面板 */
-    --bg-image:
-      radial-gradient(1200px 820px at 12% -12%, rgba(255, 255, 255, .11), transparent 62%),
-      radial-gradient(1000px 720px at 90% 4%, rgba(255, 255, 255, .075), transparent 64%),
-      radial-gradient(1100px 900px at 50% 118%, rgba(255, 255, 255, .06), transparent 62%);
-    --surface: rgba(255, 255, 255, .055);
-    --surface-2: rgba(255, 255, 255, .085);
-    --surface-3: rgba(255, 255, 255, .12);
-    --border: rgba(255, 255, 255, .11);
-    --border-strong: rgba(255, 255, 255, .18);
-    --border-hover: rgba(255, 255, 255, .30);
-    --text: #f2f5f9;
-    --text-2: #a7b3c2;
-    --text-3: #7f8c9c;
-    --text-soft: #66717f;
-    --placeholder: #66717f;
-    --cal-muted: rgba(255, 255, 255, .18);
+    --bg: #010102;
+    --bg-image: none;
+    --surface: #0f1011;
+    --surface-2: #141516;
+    --surface-3: #18191a;
+    --border: #23252a;
+    --border-strong: #34343a;
+    --border-hover: #3e3e44;
+    --text: #f7f8f8;
+    --text-2: #d0d6e0;
+    --text-3: #8a8f98;
+    --text-soft: #62666d;
+    --placeholder: #62666d;
+    --cal-muted: rgba(255, 255, 255, .20);
     --scroll-thumb: rgba(255, 255, 255, .16);
     --scroll-thumb-hover: rgba(255, 255, 255, .30);
 
-    /* 强调色：去蓝，改为近白中性色（按钮呈白色玻璃，作文字 / 描边也清晰） */
-    --accent: #e9eef4;
-    --accent-hover: #ffffff;
-    --accent-active: #d5dde6;
-    --accent-soft: rgba(255, 255, 255, .14);
-    --accent-soft-2: rgba(255, 255, 255, .20);
-    --accent-border: rgba(255, 255, 255, .30);
-    --accent-ring: rgba(255, 255, 255, .30);
-    --on-accent: #0a0e14;
+    /* 强调色：Linear 薰衣草蓝的深色档（略提亮，保证在近黑底上既能当文字色、也能当填充色） */
+    --accent: #6e79e0;
+    --accent-hover: #828fff;   /* 规范里的 primary-hover */
+    --accent-active: #5e69d1;  /* 规范里的 primary-focus */
+    --accent-soft: rgba(94, 106, 210, .16);
+    --accent-border: rgba(94, 106, 210, .42);
+    --accent-ring: rgba(94, 106, 210, .45);
+    --on-accent: #ffffff;
 
-    /* 暗色下的状态色：石板灰 / 蓝 / 橙 / 青绿（蓝仅保留在状态体系内） */
-    --st-todo: #9fb0c6;
-    --st-doing: #60a5fa;
-    --st-revise: #fb923c;
-    --st-done: #2dd4bf;
+    /* 深色档的状态语义色 */
+    --st-todo: #8a8f98;
+    --st-doing: #6e79e0;
+    --st-revise: #f2994a;
+    --st-done: #27a644;
 
-    --danger: #f87171;
-    --danger-hover: #fca5a5;
-    --danger-soft: rgba(248, 113, 113, .14);
-    --danger-border: rgba(248, 113, 113, .32);
+    --danger: #e5484d;
+    --danger-hover: #ff6369;
+    --danger-soft: rgba(229, 72, 77, .16);
 
-    --overlay: rgba(4, 7, 12, .62);
-    --toast-bg: rgba(18, 24, 32, .88);
-    --toast-fg: #f2f5f9;
-    --toast-ok: #4ade80;
+    --overlay: rgba(0, 0, 0, .68);
+    --toast-bg: #18191a;
+    --toast-fg: #f7f8f8;
+    --toast-ok: #27a644;
 
-    --sh-1: 0 1px 2px rgba(0, 0, 0, .38);
-    --sh-2: 0 2px 8px -2px rgba(0, 0, 0, .42), 0 10px 26px -8px rgba(0, 0, 0, .42);
-    --sh-3: 0 4px 12px -4px rgba(0, 0, 0, .46), 0 18px 40px -12px rgba(0, 0, 0, .50);
-    --sh-4: 0 6px 16px -6px rgba(0, 0, 0, .50), 0 26px 56px -18px rgba(0, 0, 0, .56);
-    --sh-5: 0 10px 24px -8px rgba(0, 0, 0, .54), 0 36px 76px -26px rgba(0, 0, 0, .62);
-    --sh-drop: 0 4px 14px rgba(0, 0, 0, .52);
-    --ring-stroke: rgba(0, 0, 0, .34);
+    --sh-1: none;
+    --sh-2: 0 1px 1px rgba(0, 0, 0, .28);
+    --sh-3: 0 2px 8px rgba(0, 0, 0, .36);
+    --sh-4: 0 8px 20px rgba(0, 0, 0, .44);
+    --sh-5: 0 16px 40px rgba(0, 0, 0, .52);
+    --ring-stroke: rgba(255, 255, 255, .10);
 
-    /* 顶栏浮动玻璃药丸：极淡白底 + 顶沿白色高光，靠外扩大阴影浮起 */
-    --nav-bg: rgba(255, 255, 255, .07);
-    --nav-border: rgba(255, 255, 255, .13);
-    --nav-hover: rgba(255, 255, 255, .11);
-    --nav-shadow:
-      0 1px 1px rgba(0, 0, 0, .42),
-      0 14px 32px -16px rgba(0, 0, 0, .60),
-      0 40px 78px -34px rgba(0, 0, 0, .72),
-      inset 0 1px 0 rgba(255, 255, 255, .16);
+    /* 顶栏：Linear top-nav 深色档（surface-1 半透明 + 轻微模糊） */
+    --nav-bg: color-mix(in srgb, #0f1011 86%, transparent);
+    --nav-border: #23252a;
+    --nav-hover: rgba(255, 255, 255, .06);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html {
     scroll-behavior: smooth;
-    /* 背景：多层柔光斑固定铺满视口，垫在玻璃面板之下 */
+    /* 背景：Linear 的 canvas 纯色画布（近黑 / 近白，全站无装饰渐变） */
     background-color: var(--bg);
     background-image: var(--bg-image);
     background-attachment: fixed;
@@ -368,30 +342,28 @@
   /* ============ shell: 左侧导航轨 + 主区 ============ */
   .shell { display: flex; gap: 20px; align-items: flex-start; max-width: 1560px; margin: 0 auto; }
 
-  /* ============ 0 · 左侧导航轨：Aceternity「Sidebar」风格 ============
-     参考 https://ui.aceternity.com/components/sidebar
-     原组件是一条窄图标条，鼠标移入时整条加宽、文案淡入；这里落到本站的视图切换上：
-     ① .sidebar 只留 64px 占位，真正那张卡片是绝对定位的 .side-card，
-        加宽时以浮层形式盖在正文之上，不挤压右侧内容；
-     ② 折叠态只显示图标，悬停 / 键盘聚焦时展开到 210px 并淡入文案；
-     ③ 窄屏塌成 0 高，界面换成顶栏里的汉堡入口 + 从左侧滑入的全屏抽屉。 */
+  /* ============ 0 · 左侧导航轨：Linear「炭灰面板 + 表面提升选中项」语法 ============
+     ① .sidebar 只留 64px 占位，真正那块面板是绝对定位的 .side-card：
+        surface-1 底色 + 1px 发丝描边 + 12px 圆角，层级靠底色与发丝线给出，几乎不用投影；
+     ② 折叠态只显示图标，悬停 / 键盘聚焦时展开到 210px 并淡入文案，展开时底色仍是实底，不透视背后正文；
+     ③ 选中项不做左侧竖线，改成表面提升（surface-2 铺底）+ 薰衣草文字，与 Linear 侧栏一致；
+     ④ 窄屏塌成 0 高，界面换成顶栏里的汉堡入口 + 从左侧滑入的全屏抽屉。 */
   .sidebar {
     /* 顶栏已提到整宽并 sticky 在视口顶部，侧栏落在其下方：
-       sticky 阈值让开顶栏占位（80px）+ 与正文的间距（14px），滚动时不会钻到顶栏底下 */
-    position: sticky; top: 94px; z-index: 35;
+       sticky 阈值让开顶栏占位（53px）+ 与正文的间距（14px），滚动时不会钻到顶栏底下 */
+    position: sticky; top: 68px; z-index: 35;
     width: 64px; flex: none;
-    min-height: calc(100vh - 130px);
+    min-height: calc(100vh - 100px);
     animation: rise .4s var(--ease-out) both;
   }
 
-  /* 侧栏本体：折叠 64px / 展开 210px，宽度与阴影一起过渡 */
+  /* 侧栏本体：折叠 64px / 展开 210px，宽度随展开动画过渡；Linear 面板几乎不投影 */
   .side-card {
     position: absolute; left: 0; top: 0; bottom: 0;
     width: 64px; overflow: hidden;
     display: flex; flex-direction: column;
     background: var(--surface); border: 1px solid var(--border);
-    border-radius: var(--radius-lg); padding: 12px 8px;
-    box-shadow: var(--shadow-sm);
+    border-radius: var(--r-lg); padding: 10px 6px;
     transition: width var(--dur-3) var(--ease-out), box-shadow var(--dur-3) var(--ease-out),
                 background var(--dur-3) var(--ease-out);
   }
@@ -402,26 +374,22 @@
      图标框固定 24px、靠左 20px，因此展开前后图标原地不动，只有文案淡入右移 */
   .tab, .side-btn {
     position: relative;
-    display: flex; align-items: center; gap: 10px; width: 100%;
+    display: flex; align-items: center; gap: 9px; width: 100%;
     text-align: left; border: none; background: none;
-    padding: 9px 0 9px 12px; cursor: pointer; color: var(--text-3); font-weight: 600;
-    border-radius: var(--r-md); font-size: var(--fs-sm); margin-bottom: 2px;
+    padding: 8px 0 8px 11px; cursor: pointer; color: var(--text-3); font-weight: var(--fw-medium);
+    border-radius: var(--r-sm); font-size: var(--fs-sm); margin-bottom: 1px;
     transition: background var(--dur-2) var(--ease), color var(--dur-2) var(--ease), transform var(--dur-1) var(--ease);
   }
   .tab .ico, .side-btn .ico { width: 24px; height: 24px; flex: none; display: grid; place-items: center; }
-  .tab .ico .bi, .side-btn .ico .bi { font-size: var(--fs-lg); opacity: .8; transition: opacity var(--dur-2) var(--ease); }
+  .tab .ico .bi, .side-btn .ico .bi { font-size: var(--fs-lg); opacity: .85; transition: opacity var(--dur-2) var(--ease); }
   .tab .lbl, .side-btn .lbl {
     white-space: nowrap; opacity: 0; transform: translateX(-6px);
     transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out);
   }
-  .tab:hover, .side-btn:hover { color: var(--text-2); background: var(--surface-2); }
-  .tab.active, .side-btn.active { color: var(--accent); background: var(--accent-soft); font-weight: 700; }
+  .tab:hover, .side-btn:hover { color: var(--text); background: var(--nav-hover); }
+  /* 选中项：表面提升一档（surface-2）+ 薰衣草文字，Linear 侧栏的选中语法（不用左侧竖线） */
+  .tab.active, .side-btn.active { color: var(--accent); background: var(--surface-2); font-weight: var(--fw-semibold); }
   .tab.active .ico .bi, .side-btn.active .ico .bi { opacity: 1; }
-  /* 选中项左侧一道短竖线：轨道上最容易被扫读的定位标记 */
-  .tab.active::before, .side-btn.active::before {
-    content: ""; position: absolute; left: -6px; top: 9px; bottom: 9px; width: 3px;
-    border-radius: var(--r-full); background: var(--accent);
-  }
   .tab:active, .side-btn:active { transform: scale(.97); }
   .tab[disabled], .side-btn[disabled] { opacity: .5; cursor: not-allowed; }
   .side-sep { height: 1px; flex: none; background: var(--border); margin: var(--sp-3) var(--sp-2) var(--sp-2); }
@@ -433,11 +401,10 @@
 
   /* 桌面端：悬停或键盘聚焦时展开成完整侧栏 */
   @media (min-width: 861px) {
-    /* 展开后侧栏是浮在正文之上的卡片：底色必须变实，否则背后的日历会透过半透明底显出来 */
+    /* 展开后侧栏浮在正文之上：底色是实心 surface（Linear 浮层不用半透明玻璃），只补一道极轻投影做区隔 */
     .sidebar:hover .side-card,
     .sidebar:focus-within .side-card {
-      width: 210px; box-shadow: var(--sh-4);
-      background: color-mix(in srgb, var(--bg) 96%, transparent);
+      width: 210px; box-shadow: var(--sh-3);
     }
     .sidebar:hover .tab .lbl, .sidebar:hover .side-btn .lbl,
     .sidebar:focus-within .tab .lbl, .sidebar:focus-within .side-btn .lbl { opacity: 1; transform: none; }
@@ -445,108 +412,80 @@
 
   .wrap { flex: 1; min-width: 0; max-width: 1420px; }
 
-  /* ============ 1 · 顶栏：Aceternity「Navbar Dark Shadow」风格浮动药丸 ============
-     参考 https://ui.aceternity.com/blocks/navbars/navbar-dark-shadow
-     ① 64px 高、16px 圆角的浮动条，靠外扩大阴影 + 脊/槽内阴影立起来；
-     ② 导航项悬停与展开时铺一层浅色药丸（原组件的选中态）；
-     ③ 点「项目」展开三列大面板：切换项目 / 项目操作 / 当前项目概况；
-     ④ 右侧保留搜索与明暗切换，对应原组件右侧的按钮区。 */
+  /* ============ 1 · 顶栏：Linear「top-nav」语法 ============
+     Linear 的 sticky 导航条：整条横向铺满、直角，底沿一道 1px 发丝线收边，
+     底色是画布色的半透明层 + 轻微模糊（深色档下即近黑，浅色档下近白）：
+     ① 左端是项目名（17px / 600），点击展开三列大面板；
+     ② 中间是 8px 圆角搜索框（Linear text-input：surface-1 底 + 发丝描边 + 前导放大镜）；
+     ③ 右端是明暗切换（沿用 Linear 定价页的胶囊切换语法）。 */
   .topbar-shell {
-    /* sticky：随页面滚动始终贴在视口顶部；（与 .shell 同宽同轴对齐）
-       玻璃主题下垫层改为向下淡出的半透明薄雾（不再铺满页面底色），
-       让药丸背后滚动的正文透出来被 backdrop-filter 模糊，形成磨砂玻璃 */
-    /* z-index 需高于侧栏（35）：顶栏是 sticky 定位会形成层叠上下文，
+    /* sticky：随页面滚动始终贴在视口顶部（与 .shell 同宽同轴对齐）
+       z-index 需高于侧栏（35）：顶栏是 sticky 定位会形成层叠上下文，
        大面板的 z-index 被锁在这一层内，若低于侧栏，面板左半会被侧栏卡片盖住 */
     position: sticky; top: 0; z-index: 40;
-    /* 最左那一格（64px，正对左侧导航轨）留给明暗切换键；
-       空出 20px 间距后，导航药丸的左端与正文（日历卡）左边缘齐平、右端与内容区右边缘齐平 */
-    display: flex; align-items: center; gap: 20px;
-    max-width: 1560px; margin: 0 auto 14px;
-    padding: 4px 0 12px;
-    background: linear-gradient(
-      to bottom,
-      color-mix(in srgb, var(--bg) 62%, transparent) 0,
-      color-mix(in srgb, var(--bg) 34%, transparent) 70%,
-      transparent 100%
-    );
-  }
-  /* 顶栏左端那一格（64px，正对左侧导航轨）：放 Origin UI comp-126 头像上传组件 */
-  .tb-corner { flex: none; width: 64px; display: flex; justify-content: center; }
-  /* ---- comp-126 头像上传：点击选图 → 按钮内预览（已按需求去掉右上角移除键与下方文件名） ---- */
-  .avatar-up { position: relative; display: inline-flex; }
-  .avatar-btn {
-    position: relative; width: 64px; height: 64px; padding: 0; overflow: hidden;
-    display: grid; place-items: center;
-    border: 1px solid var(--border-strong); border-radius: var(--r-md);
-    background: color-mix(in srgb, var(--surface) 60%, transparent);
-    -webkit-backdrop-filter: blur(14px) saturate(150%);
-    backdrop-filter: blur(14px) saturate(150%);
-    color: var(--text-2); font-size: 16px; cursor: pointer;
-    box-shadow: var(--sh-1);
-    transition: background var(--dur-2) var(--ease), color var(--dur-2) var(--ease),
-                border-color var(--dur-2) var(--ease), transform var(--dur-1) var(--ease);
-  }
-  .avatar-btn:hover {
-    color: var(--text);
-    background: color-mix(in srgb, var(--surface) 84%, transparent);
-    border-color: var(--accent-border);
-  }
-  .avatar-btn:active { transform: scale(.97); }
-  .avatar-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
-  /* 占位：内嵌图标库无人物头像字形，改用上传图标（16px、60% 不透明度） */
-  .avatar-ph { display: grid; place-items: center; opacity: .6; }
-  .avatar-img { display: block; width: 100%; height: 100%; object-fit: cover; }
-  .avatar-img[hidden], .avatar-ph[hidden] { display: none; }
-  /* 仅屏幕阅读器可见（comp-126 的无障碍播报区） */
-  .sr-only {
-    position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
-    overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0;
+    display: flex; align-items: center;
+    max-width: 1560px; margin: 0 auto;
+    /* 左端让开左侧导航轨（64px）+ 与正文的间距（20px），导航条左端与正文左边缘齐平 */
+    padding-left: 84px;
+    background: var(--nav-bg);
+    border-bottom: 1px solid var(--nav-border);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
   }
   .topbar {
-    position: relative;               /* 大面板以整条药丸为定位基准，左端与药丸左端对齐 */
-    display: flex; align-items: center; gap: var(--sp-4); flex-wrap: wrap;
-    /* 药丸不再铺满整宽：左端与正文（日历卡）左边缘齐平，右端收到内容区右边缘 */
+    position: relative;               /* 大面板以整条导航条为定位基准，左端与导航条左端对齐 */
+    /* 三段式：左（项目名）· 中（搜索）· 右（明暗开关）各占一列；
+       两翼都是 1fr 等宽轨，因此中列的搜索框与整条导航条严格同心；
+       左翼要放得下完整项目名靠的是 .halo 宽度里那个防截断安全阀（见 .halo 注释），
+       而不是把左翼改成 auto —— 那样搜索框会被挤到偏右的位置。 */
+    display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: var(--sp-4);
+    /* 与正文内容区等宽（日历卡左边缘到内容区右边缘），右端不再铺满整宽 */
     flex: 1 1 0; max-width: 1420px;
-    min-height: 64px; padding: 0 16px;
-    background: var(--nav-bg); border: 1px solid var(--nav-border); border-radius: 16px;
-    box-shadow: var(--nav-shadow);
+    min-height: 52px; padding: 0 16px;
+    background: transparent; border: none; box-shadow: none;
     animation: rise var(--dur-4) var(--ease-out) both;
   }
   /* 顶栏三段：左（项目名 + 「项目」面板入口 + 窄屏汉堡）· 中（搜索）· 右（明暗切换）。
-     左右两段等分剩余宽度，项目名因此落在药丸最左端，搜索落在正中间，明暗键落在最右端。 */
+     左段贴左、右段贴右、中段居中；左翼是 auto 轨，宽度由项目名内容决定，不会压缩、不会出省略号。 */
   .tb-left, .tb-right {
-    flex: 1 1 0; min-width: 0;
-    display: flex; align-items: center; gap: var(--sp-3);
+    min-width: 0; display: flex; align-items: center; gap: var(--sp-3);
   }
-  .tb-right { justify-content: flex-end; }
+  .tb-left { justify-self: start; }
+  .tb-right { justify-self: end; justify-content: flex-end; }
+  .tb-mid {
+    justify-self: center; min-width: 0;
+    display: flex; align-items: center; justify-content: center;
+  }
   .topbar .identity h1 {
-    font-family: var(--font-display);   /* 主标题：与正文同族的无衬线，靠字重拉层级 */
-    font-size: var(--fs-xl); font-weight: var(--fw-bold); letter-spacing: var(--ls-tight); color: var(--text); line-height: var(--lh-tight);
+    /* 裸字排版（方案 ①）：21px / 600 + 微收字距，比原来的 17px 明显更重，靠字本身立住；
+       顶栏两翼是等宽轨，左翼宽度由 .halo 的防截断安全阀保证，这里的省略号只在极窄视口下兜底 */
+    min-width: 0; flex: 0 1 auto;
+    font-family: var(--font-display);
+    font-size: var(--fs-xl); font-weight: var(--fw-semibold); letter-spacing: var(--ls-snug); color: var(--text); line-height: var(--lh-tight);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  /* ============ 顶栏右端：明暗切换（Origin UI comp-183「Labeled Switch」复刻） ============
-     原组件是一个 h-9 的双格药丸：整条是轨道，滑块半宽、满高，勾选时向右平移一格；
-     左格月亮 / 右格太阳，选中侧图标取正文色、另一侧转柔色。这里落到本站的毛玻璃皮肤上。 */
+  /* ============ 顶栏右端：明暗切换（Linear 定价页的胶囊切换语法） ============
+     整条是 surface-2 轨道 + 1px 发丝描边，滑块半宽满高、表面提升一档，勾选时向右平移一格；
+     左格月亮 / 右格太阳，选中侧图标取正文色、另一侧转柔色。 */
   .theme-sw {
     position: relative; flex: none;
-    height: 36px; padding: 2px;
+    height: 34px; padding: 2px;
     display: inline-grid; grid-template-columns: 1fr 1fr; align-items: center;
     border: 1px solid var(--border-strong); border-radius: var(--r-full);
-    background: color-mix(in srgb, var(--surface) 60%, transparent);
-    -webkit-backdrop-filter: blur(14px) saturate(150%);
-    backdrop-filter: blur(14px) saturate(150%);
-    cursor: pointer; box-shadow: var(--sh-1);
+    background: var(--surface-2);
+    cursor: pointer;
     transition: background var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease);
   }
   .theme-sw:hover {
-    background: color-mix(in srgb, var(--surface) 84%, transparent);
-    border-color: var(--accent-border);
+    border-color: var(--border-hover);
   }
   .theme-sw:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
   /* 滑块：半宽满高，圆形两端；切换时用原组件那条缓动曲线在左右两格间平移 */
   .theme-sw-thumb {
     position: absolute; top: 2px; bottom: 2px; left: 2px; width: calc(50% - 2px);
-    border-radius: var(--r-full); box-shadow: var(--sh-1);
-    background: color-mix(in srgb, var(--text) 14%, transparent);
+    border-radius: var(--r-full); box-shadow: var(--sh-2);
+    /* 滑块用 --surface-3（比轨道 --surface-2 亮一档），明暗两档下都是「浮起的那一格」 */
+    background: var(--surface-3);
     transition: transform var(--dur-3) cubic-bezier(.16, 1, .3, 1);
   }
   .theme-sw[aria-checked="true"] .theme-sw-thumb { transform: translateX(100%); }
@@ -561,7 +500,7 @@
   .theme-sw[aria-checked="false"] .theme-sw-sun,
   .theme-sw[aria-checked="true"] .theme-sw-moon { color: var(--text-soft); }
 
-  /* 大面板「项目操作」：三个毛玻璃操作键（新建 / 重命名 / 删除项目） */
+  /* 大面板「项目操作」：三个操作键（新建 / 重命名 / 删除项目） */
   .mega-acts { display: flex; flex-direction: column; gap: 6px; margin: 6px 10px 0; }
   .mega-act {
     display: flex; align-items: center; gap: 8px; width: 100%;
@@ -582,25 +521,50 @@
   }
   .mega-act:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 
-  /* ---- 项目名即「项目」大面板入口：回到药丸最左端 ---- */
-  .nav-drop { position: static; }     /* 面板改以整条 .topbar 为定位基准 */
+  /* ---- 项目名 = 「项目」大面板入口：裸字排版（方案 ①，无外框）----
+     去掉原来的 1px 描边 + surface 实底，静止态就是一串字，不再有「一圈卡片」；
+     左侧项目标记已移除，只剩项目名 + 右侧展开指示 chevron。
+     只有悬停 / 展开 / 键盘聚焦时才浮出一层柔和底色作为「可点击」的暗示，
+     chevron 平时压暗、交互时提亮，避免静止态被装饰抢戏；
+     chevron 仍挂在 JS 已维护的 aria-expanded 上，无需改脚本。 */
+  .nav-drop { position: static; min-width: 0; }     /* 面板改以整条 .topbar 为定位基准 */
   .topbar .identity {
-    margin-inline: 0; padding: 6px 12px; border-radius: var(--r-md); cursor: pointer;
+    display: inline-flex; align-items: center; gap: 10px;
+    /* 上限用绝对值而不是 100%：百分比会和外层 auto 轨互相牵制，再叠加负左外边距，
+       会把项目名挤掉 7px 触发省略号；420px 足够放约 20 个中文字，只作为超长项目名的兜底 */
+    min-width: 0; max-width: 420px;
+    /* 负左外边距让项目名压在顶栏正文的左边缘上（标记移除后由文字本身承担这个对齐点），
+       同时把悬停底色铺到文字左侧，形成一圈对称的呼吸感 */
+    margin: 0 0 0 -7px; padding: 4px 9px;
+    border: 0; border-radius: var(--r-md);
+    background: transparent; cursor: pointer;
     text-align: left;     /* 项目名放回最左边 */
     transition: background var(--dur-2) var(--ease);
   }
   .topbar .identity:hover,
   .topbar .identity[aria-expanded="true"] { background: var(--nav-hover); }
-  .topbar .identity:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .topbar .identity:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+
+  /* 项目标记（26px 薰衣草方块图标）已按用户要求去掉：项目名改成纯文字立住之后，它就是最后一件多余装饰。
+     这里只做 display:none，HTML 里的 span.proj-mark 节点保留，要还原删掉这一行即可 */
+  .topbar .proj-mark { display: none; }
+
+  /* 展开指示：平时压到 70% 不抢戏，交互时提亮；展开时翻半圈并转用强调色 */
+  .topbar .chev {
+    flex: none; width: 14px; height: 14px; color: var(--text-soft); opacity: .7;
+    transition: transform var(--dur-2) var(--ease), color var(--dur-2) var(--ease), opacity var(--dur-2) var(--ease);
+  }
+  .topbar .identity:hover .chev { color: var(--text-2); opacity: 1; }
+  .topbar .identity[aria-expanded="true"] .chev { transform: rotate(180deg); color: var(--accent); opacity: 1; }
 
   /* ---- 三列大面板 ---- */
   .mega {
     position: absolute; left: 0; top: calc(100% + 12px);
     width: min(660px, 100%); max-height: min(70vh, 540px); overflow-y: auto;
     display: grid; grid-template-columns: 1fr 1fr 1.12fr; gap: 2px; padding: 10px;
-    /* 面板悬在正文之上（正对日历那一行）：底色要变实，否则背后的日历会透过半透明底显出来 */
-    background: color-mix(in srgb, var(--bg) 96%, transparent);
-    border: 1px solid var(--border); border-radius: var(--r-xl); box-shadow: var(--sh-5);
+    /* 面板悬在正文之上（正对日历那一行）：用实底并提升到 surface-3，避免背后正文透形 */
+    background: var(--surface-3);
+    border: 1px solid var(--border-strong); border-radius: var(--r-lg); box-shadow: var(--sh-5);
     opacity: 0; transform: translateY(-6px) scale(.985); transform-origin: top left;
     pointer-events: none;
     transition: opacity var(--dur-2) var(--ease-out), transform var(--dur-2) var(--ease-out);
@@ -667,24 +631,29 @@
 
 
   /* ============ 共用原子件 ============ */
+  /* Linear 的按钮语法：主操作 = 薰衣草实底 + 8px 圆角（Linear 从不给 CTA 用满圆角），近乎不投影；
+     内边距按 Linear 的紧凑规格（8 / 14），按下态在基色上再压深一档。 */
   .btn {
-    background: var(--accent); color: var(--on-accent); border: none; border-radius: var(--radius-sm);
-    padding: 9px 17px; font-size: var(--fs-base); cursor: pointer; font-weight: 600;
-    box-shadow: var(--sh-1);
-    transition: transform var(--dur-1) var(--ease), box-shadow var(--dur-2) var(--ease), background var(--dur-2) var(--ease);
+    background: var(--accent); color: var(--on-accent); border: 1px solid var(--accent);
+    border-radius: var(--r-md);
+    padding: 8px 14px; font-size: var(--fs-base); cursor: pointer; font-weight: var(--fw-medium);
+    box-shadow: none;
+    transition: transform var(--dur-1) var(--ease), background var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease);
   }
-  .btn:hover { background: var(--accent-hover); box-shadow: var(--sh-2); transform: translateY(-1px); }
-  .btn:active { transform: translateY(0) scale(.985); }
+  .btn:hover { background: var(--accent-hover); border-color: var(--accent-hover); }
+  .btn:active { background: var(--accent-active); border-color: var(--accent-active); transform: scale(.98); }
   .btn[aria-busy="true"] { opacity: .7; cursor: progress; pointer-events: none; }
+  /* 次要操作 = 炭灰按钮：surface 底 + 1px 发丝描边 + 正文色（Linear button-secondary） */
   .btn.ghost {
-    background: var(--surface); color: var(--text-2); border: 1px solid var(--border-strong);
-    box-shadow: var(--shadow-xs); font-weight: 500;
+    background: var(--surface); color: var(--text); border: 1px solid var(--border-strong);
+    font-weight: var(--fw-medium);
   }
-  .btn.ghost:hover { color: var(--accent); border-color: var(--accent-border); background: var(--accent-soft); box-shadow: var(--shadow-xs); transform: translateY(-1px); }
-  .btn.ghost.active { color: var(--accent); border-color: var(--accent-border); background: var(--accent-soft); }
-  .btn.danger { background: var(--danger); box-shadow: var(--sh-1); }
-  .btn.danger:hover { background: var(--danger-hover); box-shadow: var(--sh-2); }
-  .btn:disabled { opacity: .5; cursor: not-allowed; transform: none; box-shadow: none; }
+  .btn.ghost:hover { color: var(--accent); border-color: var(--accent-border); background: var(--surface-2); }
+  .btn.ghost.active { color: var(--on-accent); border-color: var(--accent); background: var(--accent); }
+  .btn.danger { background: var(--danger); border-color: var(--danger); }
+  .btn.danger:hover { background: var(--danger-hover); border-color: var(--danger-hover); }
+  .btn.danger:active { background: var(--danger); border-color: var(--danger); transform: scale(.98); }
+  .btn:disabled { opacity: .5; cursor: not-allowed; transform: none; }
   /* 搜索栏最左侧的放大镜：只用占位与颜色，不抢输入框焦点 */
   .halo-lead { flex: none; font-size: var(--fs-base); color: var(--text-3); transition: color var(--dur-2) var(--ease); }
   .halo:focus-within .halo-lead { color: var(--accent); }
@@ -717,8 +686,8 @@
   .dsel-pop {
     position: fixed; z-index: 3000; max-height: 264px; overflow-y: auto;
     padding: 6px; display: flex; flex-direction: column; gap: 2px;
-    /* 弹层浮在正文之上：底色要变实，否则背后的内容会透过半透明底显出来 */
-    background: color-mix(in srgb, var(--bg) 96%, transparent);
+    /* 弹层浮在正文之上：用实底并提升到 surface-3，避免背后正文透形 */
+    background: var(--surface-3);
     border: 1px solid var(--border-strong); border-radius: var(--r-md);
     box-shadow: var(--shadow-md); animation: fade-in var(--dur-1) ease both;
   }
@@ -729,19 +698,22 @@
     transition: background var(--dur-1) ease, color var(--dur-1) ease;
   }
   .dsel-item:hover { background: var(--surface-2); color: var(--text); }
-  .dsel-item.active { background: var(--accent-soft); color: var(--accent); font-weight: 700; }
+  .dsel-item.active { background: var(--accent-soft); color: var(--accent); font-weight: var(--fw-semibold); }
 
   /* 筛选胶囊 */
   .chip {
-    padding: 7px 14px; border-radius: var(--r-full); border: 1px solid var(--border-strong); background: var(--surface);
-    color: var(--text-2); font-family: var(--font); font-size: var(--fs-sm); cursor: pointer; font-weight: 500;
-    transition: background var(--dur-2) var(--ease), color var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease), transform var(--dur-1) var(--ease); white-space: nowrap;
+    padding: 6px 13px; border-radius: var(--r-full); border: 1px solid var(--border-strong); background: var(--surface);
+    color: var(--text-2); font-family: var(--font); font-size: var(--fs-sm); cursor: pointer; font-weight: var(--fw-medium);
+    transition: background var(--dur-2) var(--ease), color var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease), transform var(--dur-1) var(--ease); white-space: nowrap;
   }
-  .chip:hover { color: var(--text); border-color: color-mix(in srgb, var(--c, var(--accent)) 45%, var(--border-strong)); transform: translateY(-1px); }
-  .chip:active { transform: scale(.96); }
+  .chip:hover { color: var(--text); border-color: color-mix(in srgb, var(--c, var(--accent)) 45%, var(--border-strong)); }
+  .chip:active { transform: scale(.98); }
   .chip.active {
-    background: var(--c, var(--accent)); border-color: var(--c, var(--accent)); color: var(--on-accent); font-weight: 600;
-    box-shadow: 0 3px 9px color-mix(in srgb, var(--c, var(--accent)) 28%, transparent);
+    /* Linear 的标签芯片是「着色淡底 + 同色文字 + 发丝描边」，不做整块饱和填充，也不起投影 */
+    background: color-mix(in srgb, var(--c, var(--accent)) 14%, var(--surface));
+    border-color: color-mix(in srgb, var(--c, var(--accent)) 45%, var(--border-strong));
+    color: color-mix(in srgb, var(--c, var(--accent)) 82%, var(--text));
+    font-weight: var(--fw-semibold); box-shadow: none;
   }
   .chips { display: inline-flex; gap: 6px; flex-wrap: wrap; align-items: center; }
   /* 筛选行 · 分段控件：组名是小标签，选项在一条轨道内线性排布，选中项由该组语义色填充 */
@@ -760,7 +732,10 @@
   .seg-thumb {
     position: absolute; left: 0; top: 0; width: 0; height: 0;
     border-radius: var(--r-full); pointer-events: none;
-    background: color-mix(in srgb, var(--c, var(--accent)) 18%, transparent);
+    /* Linear 定价页的胶囊切换语法：选中块 = 表面提升一档（surface-3 浮在 surface-2 轨道上），
+       只掺一点点该组语义色做提示，不投影 */
+    background: color-mix(in srgb, var(--c, var(--accent)) 8%, var(--surface-3));
+    box-shadow: none;
     transition: transform var(--dur-3) var(--ease-out), width var(--dur-3) var(--ease-out),
                 height var(--dur-3) var(--ease-out), background var(--dur-2) var(--ease);
   }
@@ -773,7 +748,7 @@
     font-family: var(--font); font-size: var(--fs-sm); font-weight: 600; color: var(--text-2);
     transition: background var(--dur-2) var(--ease), color var(--dur-2) var(--ease), box-shadow var(--dur-2) var(--ease), transform var(--dur-1) var(--ease);
   }
-  .seg-btn:hover { color: var(--text); background: var(--surface-2); }
+  .seg-btn:hover { color: var(--text); background: color-mix(in srgb, var(--text) 6%, transparent); }
   .seg-btn:active { transform: scale(.97); }
   /* 选中项：半透明底色交由滑动的 .seg-thumb 承担，按钮只保留语义色文字与字重 */
   .seg-btn.active {
@@ -1040,87 +1015,42 @@
     content: ""; flex: none; width: 1px; height: 20px; margin: 0 9px;
     background: var(--border-strong); border-radius: 1px;
   }
-  /* ============ Cult UI「Halo Search」复刻：外围一圈流动渐变光晕的搜索框 ============
-     参考 https://www.cult-ui.com/docs/components/halo-search
-     ① 外层留 1px 里衬，药丸本体盖一颗不透明底 + 1px 描边，于是「描边外缘」
-        透出一条被裁切的渐变光晕：3 团高斯模糊色块在药丸底部来回流动；
-     ② 光晕强度随状态变：静息 .5 → 聚焦 .78 → 清空播放时 .88 并切成暖色快扫；
-     ③ 提示文案逐字错峰淡入，清空后重放一次；
-     ④ 清空时真文本隐去、替身文本从右到左逐字模糊消散；
-     ⑤ 右侧随内容出现「清除」圆钮。原组件的 WebGL「Warp」着色器头像未移植。 */
+  /* ============ 搜索框：Linear 框体 + 逐字提示 + 清空模糊消散 ============
+     框体沿用 Linear 的 text-input 语法：8px 圆角、surface 实底、1px 发丝描边，高度 40px。
+     ① 提示文案逐字错峰淡入，清空后重放一次；
+     ② 清空时真文本隐去、替身文本从右到左逐字模糊消散；
+     ③ 回车提交时文本炸成粒子（canvas 逐帧抖动缩到零）后清空搜索；
+     ④ 右侧随内容出现「清除」圆钮。 */
   .halo {
-    --halo-op: .5;
     position: relative; flex: none;
-    /* 加长：随视口在 360–520px 之间伸缩（窄屏仍由下面的媒体查询收档），
-       下限保持原宽，不会挤压顶栏左右两段的项目名与明暗开关 */
-    width: clamp(360px, 38vw, 520px); height: 42px; padding: 1px;
+    /* 随视口伸缩，并在原来 300–560px 的基础上整体收紧 20px、再整体缩短 15px；
+       后面那个 min() 是防省略号的安全阀：两翼等宽各占 1fr 时，搜索框必须给左翼留够位置，
+       否则项目名会被压出省略号。692 = 项目名所需净宽 276×2 + 两个列间距 24 + 外壳与顶栏左右内边距 116，
+       再留约 43px 余量，保证左翼与搜索框之间还有空隙、不会贴到一起；
+       只在视口窄于约 1050px 时才真正生效，那时是让搜索框继续收窄、而不是让名字截断。
+       窄屏（≤860 / ≤720）仍由下面的媒体查询收档成 235 / 185px */
+    width: min(clamp(265px, calc(34vw - 35px), 525px), calc(100vw - 735px)); height: 40px; padding: 1px;
   }
-  .halo:focus-within { --halo-op: .78; }
 
-  /* 光晕层：整块裁成药丸形状，色块只在底部半区流动 */
-  .halo-glow {
-    position: absolute; inset: 0; overflow: hidden; border-radius: var(--r-full);
-    pointer-events: none;
-  }
-  .halo-glow-half {
-    position: absolute; left: 0; right: 0; bottom: 0; height: 50%;
-    opacity: var(--halo-op); transition: opacity .25s var(--ease-out);
-  }
-  .halo-blob { position: absolute; border-radius: var(--r-full); }
-  .halo-blob.b1 {
-    bottom: -16px; left: -5%; width: 192px; height: 64px; filter: blur(24px);
-    background: linear-gradient(90deg, var(--text-3), var(--text), var(--text-2), var(--text-3));
-    animation: halo-b1 6s var(--ease-in-out) infinite;
-  }
-  .halo-blob.b2 {
-    bottom: -12px; left: 65%; width: 128px; height: 48px; filter: blur(16px);
-    background: linear-gradient(90deg, var(--text-2), var(--text-3), var(--text));
-    animation: halo-b2 5s var(--ease-in-out) infinite;
-  }
-  .halo-blob.b3 {
-    bottom: -8px; left: 25%; width: 96px; height: 40px; filter: blur(16px);
-    background: linear-gradient(90deg, var(--text), var(--text-2), var(--text-3));
-    animation: halo-b3 4s var(--ease-in-out) infinite;
-  }
-  @keyframes halo-b1 { 0%, 100% { left: -5%; } 50% { left: 75%; } }
-  @keyframes halo-b2 { 0%, 100% { left: 65%; } 50% { left: 10%; } }
-  @keyframes halo-b3 { 0%, 100% { left: 25%; } 50% { left: 55%; } }
-  /* 清空播放中：换成中性高明度一档并缩短周期，做一次更亮的快扫 */
-  .halo.is-clearing { --halo-op: .88; }
-  .halo.is-clearing .halo-blob.b1 {
-    background: linear-gradient(90deg, var(--text-2), var(--text), var(--text-3), var(--text-2));
-    animation: halo-d1 2.35s var(--ease-in-out) infinite;
-  }
-  .halo.is-clearing .halo-blob.b2 {
-    background: linear-gradient(90deg, var(--text-3), var(--text-2), var(--text), var(--text-2));
-    animation: halo-d2 2s var(--ease-in-out) infinite;
-  }
-  .halo.is-clearing .halo-blob.b3 {
-    background: linear-gradient(90deg, var(--text), var(--text-3), var(--text-2), var(--text));
-    animation: halo-d3 1.65s var(--ease-in-out) infinite;
-  }
-  @keyframes halo-d1 { 0%, 100% { left: -8%; } 50% { left: 92%; } }
-  @keyframes halo-d2 { 0%, 100% { left: 72%; } 50% { left: -2%; } }
-  @keyframes halo-d3 { 0%, 100% { left: 35%; } 50% { left: 62%; } }
-
-  /* 药丸本体：不透明底 + 1px 描边，把光晕挡在内里，只从 1px 里衬透出来 */
+  /* 框体本体：Linear 的 surface 实底 + 1px 发丝描边 + 8px 圆角 */
   .halo-field {
     position: relative; z-index: 1;
     height: 100%; display: flex; align-items: center; gap: 8px;
-    padding: 0 8px 0 12px;
-    border-radius: var(--r-full); border: 1px solid var(--border);
-    background: linear-gradient(to bottom,
-      var(--surface) 0%,
-      color-mix(in srgb, var(--surface) 93%, var(--surface-2)) 100%);
-    box-shadow: var(--shadow-xs);
-    transition: border-color .2s var(--ease);
+    padding: 0 8px 0 11px;
+    border-radius: var(--r-md); border: 1px solid var(--border-strong);
+    background: var(--surface);
+    transition: border-color .2s var(--ease), box-shadow .2s var(--ease);
   }
   .halo:focus-within .halo-field {
-    border-color: color-mix(in srgb, var(--accent) 55%, var(--border));
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px var(--accent-soft);
   }
   .halo-text { position: relative; flex: 1 1 auto; min-width: 0; height: 100%; }
 
-  /* 输入框：抹掉全局 input 规则的原生外观，药丸的描边就是它的框 */
+  /* 提交粒子层：盖在输入框文本区上，逐帧抖动缩到零 */
+  .halo-dust { position: absolute; inset: 0; z-index: 3; pointer-events: none; }
+
+  /* 输入框：抹掉全局 input 规则的原生外观，外层那圈 1px 描边就是它的框体 */
   .halo-input {
     width: 100%; height: 100%; margin: 0; padding: 0;
     border: none; border-radius: 0; background: transparent;
@@ -1197,10 +1127,9 @@
     background: var(--accent-soft); color: var(--accent);
     box-shadow: inset 0 0 0 1.5px var(--accent-border);
   }
-  .panel-actions .btn.ghost { padding: 8px 13px; font-size: var(--fs-sm); }
-
   /* ============ 5 · 任务卡片网格 ============ */
-  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); overflow: hidden; animation: rise var(--dur-4) var(--ease-out) both; animation-delay: .1s; }
+  /* 承载面板 = Linear 面板：surface 底 + 1px 发丝描边 + 12px 圆角，几乎不投影 */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; animation: rise var(--dur-4) var(--ease-out) both; animation-delay: .1s; }
   .task-cards {
     display: grid; grid-template-columns: repeat(auto-fill, minmax(272px, 1fr));
     gap: 12px; padding: 14px;
@@ -1263,43 +1192,27 @@
   /* 纵向排列的落点提示改为上下描边（通用规则是左右描边，只适合网格布局） */
   .tcard.is-mrow.drop-before { box-shadow: 0 -3px 0 0 var(--accent), var(--shadow-sm); }
   .tcard.is-mrow.drop-after { box-shadow: 0 3px 0 0 var(--accent), var(--shadow-sm); }
-  /* 任务卡：左侧一条状态色条 + 分行信息，hover 抬升 */
+  /* 任务卡：左侧一条状态色条 + 分行信息；
+     Linear 卡片的层级由表面色阶给出：--surface-2 的卡铺在 --surface 的容器上，靠底色递进，不靠投影与抬升 */
   .tcard {
-    position: relative; background: var(--surface); border: 1px solid var(--border);
+    position: relative; background: var(--surface-2); border: 1px solid var(--border);
     border-left: 3px solid var(--sc, var(--accent));
     border-radius: var(--r-lg); padding: 12px 13px 11px; cursor: pointer;
     display: flex; flex-direction: column; gap: 9px;
-    box-shadow: var(--shadow-xs);
-    transition: box-shadow var(--dur-2) var(--ease), transform var(--dur-2) var(--ease), border-color var(--dur-2) var(--ease);
+    transition: border-color var(--dur-2) var(--ease);
   }
-  .tcard:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); border-color: color-mix(in srgb, var(--sc, var(--accent)) 35%, var(--border)); }
+  .tcard:hover { border-color: color-mix(in srgb, var(--sc, var(--accent)) 40%, var(--border-strong)); }
   .tcard:active { cursor: grabbing; }
   .tcard.dragging { opacity: .4; }
   .tcard.drop-before { box-shadow: -3px 0 0 0 var(--accent), var(--shadow-sm); }
   .tcard.drop-after { box-shadow: 3px 0 0 0 var(--accent), var(--shadow-sm); }
-  .tc-head { display: flex; align-items: flex-start; gap: 9px; }
   .tc-name { flex: 1; font-weight: var(--fw-semibold); font-size: var(--fs-base); line-height: var(--lh-snug); color: var(--text); min-width: 0; }
   .tcard.is-done .tc-name { color: var(--text-soft); text-decoration: line-through; text-decoration-color: color-mix(in srgb, var(--text-soft) 50%, transparent); }
-  .tc-head .icon-btn { flex: none; margin: -3px -4px 0 0; }
-  .tc-badges { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
   .tc-stage {
     display: inline-flex; align-items: center; font-size: var(--fs-2xs); font-weight: 600;
-    color: var(--text-soft); background: var(--surface-2); border: 1px solid var(--border);
+    color: var(--text-soft); background: var(--surface); border: 1px solid var(--border);
     border-radius: var(--r-xs); padding: 3px 8px;
   }
-  .tc-foot { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; margin-top: auto; padding-top: 2px; }
-  .tc-foot .mini {
-    display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-num);
-    font-size: var(--fs-2xs); color: var(--text-2); background: var(--surface-2); border: 1px solid var(--border);
-    border-radius: var(--r-xs); padding: 3px 7px; font-variant-numeric: tabular-nums;
-  }
-  .tc-foot .mini .bi { font-size: var(--fs-2xs); opacity: .7; }
-  .tc-foot .mini.overdue { color: var(--danger); background: var(--danger-soft); border-color: var(--danger-border); }
-  .tc-foot .mini.overdue .bi { opacity: 1; }
-
-  .date { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-num); font-variant-numeric: tabular-nums; color: var(--text-2); }
-  .date .od-tag { font-size: var(--fs-2xs); font-weight: var(--fw-bold); color: var(--danger); background: var(--danger-soft); border-radius: var(--r-xs); padding: 1px 6px; letter-spacing: var(--ls-chip); }
-  .date.overdue { color: var(--danger); font-weight: 600; }
   .icon-btn {
     display: inline-grid; place-items: center; width: 28px; height: 28px; border-radius: var(--r-sm);
     border: none; background: transparent; color: var(--text-soft); cursor: pointer; opacity: 0; font-size: var(--fs-md);
@@ -1312,7 +1225,6 @@
   .icon-btn:hover, .icon-btn:focus-visible { background: var(--danger-soft); color: var(--danger); }
   .icon-btn:active { transform: scale(.9); }
 
-  .empty-cell { padding: 0 !important; border-bottom: none !important; }
   .empty { padding: var(--sp-11) 20px; text-align: center; color: var(--text-soft); grid-column: 1 / -1; }
   .empty .bi { display: block; margin: 0 auto 12px; font-size: 28px; opacity: .35; }
   .empty b { display: block; color: var(--text-2); font-size: var(--fs-md); font-weight: var(--fw-bold); margin-bottom: 5px; }
@@ -1326,15 +1238,17 @@
     position: relative;
     background: var(--surface);
     border: 1px solid var(--border);
-    /* 列顶状态色：直接用上边框画，边框天然沿着圆角走，不会外露也不会内缩 */
-    border-top: 3px solid color-mix(in srgb, var(--c, var(--accent)) 70%, var(--surface));
+    /* 列顶状态色：直接用上边框画，边框天然沿着圆角走，不会外露也不会内缩；
+       Linear 只用实色，不做淡化，色带就是这一列的识别色 */
+    border-top: 3px solid var(--c, var(--accent));
     border-radius: var(--radius-lg);
     padding: 0 0 14px;
     overflow: hidden;
-    transition: box-shadow .2s ease, border-color .2s ease;
+    transition: border-color .2s ease;
   }
-  .col:hover { box-shadow: var(--shadow-sm); border-color: color-mix(in srgb, var(--c, var(--accent)) 18%, var(--border)); }
-  .col.drop-hover { outline: 2px dashed var(--accent); outline-offset: -2px; background: var(--accent-soft); }
+  .col:hover { border-color: color-mix(in srgb, var(--c, var(--accent)) 30%, var(--border-strong)); }
+  /* 拖拽落点：Linear 的选中提示是 2px 实线品牌薰衣草蓝，不用虚线 */
+  .col.drop-hover { outline: 2px solid var(--accent); outline-offset: -2px; background: var(--accent-soft); }
 
   .col-head { padding: 14px 16px 12px; }
   .col-head .ch-row { display: flex; align-items: center; gap: 8px; }
@@ -1396,10 +1310,6 @@
   .ticket.dragging { opacity: .38; transform: rotate(1.5deg) scale(.98); }
   .ticket.drop-before { box-shadow: 0 -3px 0 0 var(--accent), var(--shadow-md); }
 
-  .ticket .t-head { display: flex; align-items: flex-start; gap: 9px; margin-bottom: 8px; }
-  .ticket .t-name { font-weight: var(--fw-semibold); padding-right: 2px; line-height: var(--lh-snug); font-size: var(--fs-sm); color: var(--text); }
-  .ticket .t-meta { display: flex; gap: 5px; flex-wrap: wrap; align-items: center; }
-
   /* ============ 任务卡片：kanban-board 卡片样式 ============
      参考 https://www.cult-ui.com/docs/components/kanban-board
      软底面板 + 彩色标签行 + 标题 + 底行。
@@ -1450,19 +1360,11 @@
   .tcard.kcard.drop-before { box-shadow: -3px 0 0 0 var(--accent), var(--shadow-sm); }
   .tcard.kcard.drop-after { box-shadow: 3px 0 0 0 var(--accent), var(--shadow-sm); }
   .ticket.kcard.drop-before { box-shadow: 0 -3px 0 0 var(--accent), var(--shadow-md); }
-  .ticket .mini {
-    display: inline-flex; align-items: center; gap: 4px; font-family: var(--font-num);
-    font-size: var(--fs-2xs); color: var(--text-2); background: var(--surface-2); border: 1px solid var(--border);
-    border-radius: var(--r-xs); padding: 3px 7px; font-variant-numeric: tabular-nums;
-  }
-  .ticket .mini .bi { font-size: var(--fs-2xs); opacity: .7; }
-  .ticket .mini.overdue { color: var(--danger); background: var(--danger-soft); border-color: var(--danger-border); }
-  .ticket .mini.overdue .bi { opacity: 1; }
 
   .col-empty { border: 1.5px dashed var(--border-strong); border-radius: var(--r-md); padding: 24px 12px; text-align: center; color: var(--text-soft); font-size: var(--fs-xs); background: transparent; line-height: var(--lh-relaxed); }
   .col-empty .bi { display: block; margin: 0 auto 6px; font-size: 28px; opacity: .35; }
 
-  /* ============ 7 · 时间轴视图：按截止日期纵向排成时间轴 ============ */
+  /* ============ 7 · 日期视图：按截止日期纵向排成一份日程清单 ============ */
   .timeline { padding: 6px 14px 14px; }
   .tl-row {
     display: grid; grid-template-columns: 116px 1fr; gap: 14px;
@@ -1608,7 +1510,6 @@
   /* import preview */
   .imp-preview { background: var(--surface-2); border: 1px solid var(--border); border-radius: var(--radius-sm); padding: 12px; max-height: 340px; overflow-y: auto; }
   .imp-count { font-size: var(--fs-xs); font-weight: 700; color: var(--accent); margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
-  .imp-item { display: flex; align-items: center; gap: 8px; font-size: var(--fs-sm); padding: 3px 0; color: var(--text-2); animation: fade-in .2s ease both; }
   .imp-tag { background: var(--accent-soft); color: var(--accent); padding: 1px 8px; font-size: var(--fs-2xs); border-radius: var(--r-xs); font-weight: 600; }
   .imp-more { font-size: var(--fs-xs); color: var(--text-soft); padding: 3px 0; }
   .imp-total { color: var(--accent); font-weight: 700; }
@@ -1738,12 +1639,13 @@
   @media (max-width: 860px) {
     .shell { flex-direction: column; }
     /* 窄屏：搜索框先收第一档，再在 720px 收第二档 */
-    .halo { width: 250px; }
-    /* 窄屏：顶栏左端那一格保持 64px（头像方块占满），药丸从它右侧开始 */
-    .topbar-shell { gap: 10px; }
-    /* 窄屏：三段改为自然宽度、允许换行；搜索用自动外边距居中（换行时独占一行居中） */
+    .halo { width: 235px; }
+    /* 窄屏：侧栏塌成 0 宽，导航条不再需要让位左侧导航轨 */
+    .topbar-shell { padding-left: 0; }
+    /* 窄屏：网格退回可换行的流式排布；中段按内容宽参与一行，装不下时才换行 */
+    .topbar { display: flex; flex-wrap: wrap; row-gap: 6px; }
     .tb-left, .tb-right { flex: 0 1 auto; }
-    .halo { margin: 0 auto; }
+    .tb-mid { flex: 1 1 auto; }
     /* 侧栏本体在窄屏塌成 0 高：真正露出的界面是那个全屏抽屉，汉堡入口挪进顶栏 */
     .sidebar { width: 100%; height: 0; min-height: 0; position: static; z-index: auto; animation: none; }
     .side-burger {
@@ -1753,8 +1655,8 @@
       transition: background var(--dur-2) var(--ease), color var(--dur-2) var(--ease);
     }
     .side-burger:hover { background: var(--nav-hover); color: var(--text); }
-    /* 窄屏顶栏左侧多了汉堡键：收紧项目名内边距 */
-    .topbar .identity { padding: 6px 8px; }
+    /* 窄屏顶栏左侧多了汉堡键：收紧裸字排版的左右内边距，把空间让给项目名 */
+    .topbar .identity { padding: 4px 6px; margin-left: -5px; }
     /* 卡片改成从左侧滑入的全屏抽屉，盖满整个视口 */
     .side-card {
       position: fixed; inset: 0; width: auto; height: auto;
@@ -1788,6 +1690,7 @@
   @media (max-width: 720px) {
     body { padding: 16px 12px 48px; }
     .topbar { padding: 0 12px 0 14px; }
+    /* 720px 以下回到 17px：顶栏只有 52px 高、横向空间也最紧，字号必须让位给可读字数 */
     .topbar .identity h1 { font-size: var(--fs-lg); }
     .mega { top: calc(100% + 10px); }
     .cal-card { flex-direction: column; width: 100%; }
@@ -1801,7 +1704,7 @@
     .seg { flex-wrap: wrap; border-radius: var(--r-lg); }
     .seg-btn { padding: 4px 9px; }
     /* 窄屏：搜索框收一档，仍能落在一行内 */
-    .halo { width: 200px; }
+    .halo { width: 185px; }
     .btn { padding: 8px 13px; font-size: var(--fs-sm); }
     .modal { padding: 22px 18px; }
   }
@@ -1814,24 +1717,12 @@
   }
 
   /* ============================================================
-     GLASS SKIN · 半透明玻璃拟态（磨砂）
-     背景为固定的多层柔和光斑；主要承载面板与浮层统一以 backdrop-filter 模糊其后内容，
-     配合半透明底 + 1px 高光描边 + 柔和投影形成玻璃质感。放在样式表末尾，覆盖上面的平面材质。
-     backdrop-filter 落在「最外层可见承载面」上（容器模糊，其内卡片自然继承模糊后的背景），
-     既保证磨砂观感，又避免逐张卡片重复开启滤镜带来的性能开销。
+     Linear 平面材质
+     Linear 的 chrome 一律不投影、不用装饰渐变：层级由「画布 ↔ surface 阶」几层实底递进给出。
+     因此这里不再给卡片 / 容器开 backdrop-filter（底色已是实底，模糊没有可见效果，只留性能开销）；
+     仅保留两处功能性模糊：贴顶的导航条（见 .topbar-shell）与弹窗遮罩。
      ============================================================ */
-  :where(.topbar, .side-card, .panels, .card, .col,
-         .cal-card, .ring-card, .memo-card, .cd-box,
-         .mega, .dsel-pop, .modal, .toast) {
-    -webkit-backdrop-filter: blur(18px) saturate(160%);
-    backdrop-filter: blur(18px) saturate(160%);
-  }
-  /* 展开的三列大面板 / 自定义下拉 / 弹窗 / 提示：模糊更强，保证其后内容不透形 */
-  :where(.mega, .dsel-pop, .modal, .toast) {
-    -webkit-backdrop-filter: blur(26px) saturate(170%);
-    backdrop-filter: blur(26px) saturate(170%);
-  }
-  /* 遮罩层：加深压暗 + 更强模糊，把视线收拢到弹窗上 */
+  /* 遮罩层：加深压暗 + 模糊，把视线收拢到弹窗上 */
   .overlay {
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
@@ -1840,21 +1731,10 @@
 </head>
 <body>
 
-<!-- 1 · 顶部：Aceternity「Navbar Dark Shadow」风格浮动导航条（sticky 在视口顶部） -->
+<!-- 1 · 顶部：Linear「top-nav」条（sticky 在视口顶部，直角 + 发丝底沿，chrome 不投影） -->
 <div class="topbar-shell">
-  <!-- 左：Origin UI comp-126 头像上传，单独占住顶栏左端、左侧导航轨正上方那一格 -->
-  <div class="tb-corner">
-    <div class="avatar-up" id="avatar-up">
-      <button type="button" class="avatar-btn" id="avatar-btn" aria-label="上传头像">
-        <img class="avatar-img" id="avatar-img" alt="已上传头像预览" hidden />
-        <span class="avatar-ph" id="avatar-ph" aria-hidden="true"><i class="bi bi-upload"></i></span>
-      </button>
-      <input type="file" id="avatar-file" class="hidden" accept="image/*" aria-label="上传头像文件" />
-      <div class="sr-only" id="avatar-status" aria-live="polite" role="status">未上传图片</div>
-    </div>
-  </div>
 <div class="topbar">
-  <!-- 左：项目名（「项目」大面板入口）+ 窄屏汉堡，因此落在药丸最左端 -->
+  <!-- 左：项目名（「项目」大面板入口）+ 窄屏汉堡，落在导航条最左端 -->
   <div class="tb-left">
     <!-- 窄屏：侧栏收进抽屉后，改由这里进入（桌面端不显示） -->
     <button type="button" class="side-burger" id="side-burger"
@@ -1865,7 +1745,19 @@
     <div class="nav-drop" id="proj-drop">
       <div class="identity" id="proj-trigger" role="button" tabindex="0"
            aria-expanded="false" aria-controls="proj-mega" aria-haspopup="true">
+        <!-- 项目标记：内联 SVG，不依赖图标字体子集 -->
+        <span class="proj-mark" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/>
+            <path d="M8 8.5h8M8 12h8M8 15.5h5"/>
+          </svg>
+        </span>
+        <!-- 项目名：JS 只更新这一个节点的文本，因此标记与展开指示都必须是它的兄弟节点 -->
         <h1 id="page-title">进度看板</h1>
+        <!-- 展开指示 -->
+        <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M6 9l6 6 6-6"/>
+        </svg>
       </div>
       <div class="mega" id="proj-mega" aria-label="项目">
         <div class="mega-col">
@@ -1900,17 +1792,10 @@
     </div>
   </div>
 
-  <!-- 中：搜索：Cult UI「Halo Search」复刻（流动渐变光晕 + 逐字提示 + 清空模糊消散） -->
+  <!-- 中：搜索：Linear text-input 框体 + 逐字提示（回车提交时粒子消散） -->
+  <div class="tb-mid">
   <div class="halo" id="halo-search">
-    <!-- 光晕层：整块裁成药丸形状，三团模糊色块只在底部半区来回流动 -->
-    <div class="halo-glow" aria-hidden="true">
-      <div class="halo-glow-half">
-        <span class="halo-blob b1"></span>
-        <span class="halo-blob b2"></span>
-        <span class="halo-blob b3"></span>
-      </div>
-    </div>
-    <!-- 药丸本体：不透明底 + 1px 描边，光晕只从里衬那一圈透出来 -->
+    <!-- 框体：Linear 的 surface 底 + 1px 发丝描边 + 8px 圆角，聚焦时套品牌色焦点环 -->
     <div class="halo-field">
       <i class="bi bi-search halo-lead" aria-hidden="true"></i>
       <div class="halo-text">
@@ -1927,6 +1812,7 @@
         </button>
       </div>
     </div>
+  </div>
   </div>
 
   <!-- 右：明暗切换，Origin UI comp-183「Labeled Switch」复刻（左月亮 / 右太阳，滑块在左右两格间平移） -->
@@ -1963,7 +1849,7 @@
       </button>
       <button type="button" class="tab" data-view="timeline">
         <span class="ico"><i class="bi bi-clock-history" aria-hidden="true"></i></span>
-        <span class="lbl">时间轴</span>
+        <span class="lbl">日期视图</span>
       </button>
       </div>
       <div class="side-sep"></div>
@@ -2002,7 +1888,7 @@
         </div>
       </div>
 
-      <!-- 时间块（仅时间轴视图显示）：固定三个月，按天的小方格横向对称铺满卡片 -->
+      <!-- 时间块（仅日期视图显示）：固定三个月，按天的小方格横向对称铺满卡片 -->
       <div class="cal-card ts-card hidden" id="ts-card">
         <div class="ts-wrap">
           <div class="cal-head">
@@ -2211,7 +2097,7 @@ let fStatus = "";    // active status filter ("" = all)
 let fPriority = "";  // active priority filter ("" = all)
 let fTime = "";      // active deadline-time filter ("" = all)
 let animateRows = true;   // entrance animation only on load / view & project switch
-let tlFolded = false;     // 时间轴视图：整段折叠后收起任务块，只留日期行与条数
+let tlFolded = false;     // 日期视图：整段折叠后收起任务块，只留日期行与条数
 let batchMode = false;    // 任务列表视图 · 任务管理（批量）模式
 const batchSel = new Set();  // 批量模式下已选中的任务 id
 
@@ -2221,7 +2107,7 @@ const items = () => activeProject().items;
 function persist() { store.save(data); render(); }
 
 /* 视图与筛选状态：与任务数据分开存一份界面偏好，不进数据备份。
-   刷新后回到上次的视图（任务列表 / 看板 / 时间轴）与筛选条件。 */
+   刷新后回到上次的视图（任务列表 / 看板 / 日期视图）与筛选条件。 */
 const UI_KEY = CONFIG.storageKey + ".ui";
 function loadUI() {
   let o = {};
@@ -2405,7 +2291,6 @@ function renderRing() {
 
   let angle = -Math.PI / 2;   // start at 12 o'clock
   const segHTML = [];
-  const lblHTML = [];
 
   parts.forEach((p, i) => {
     const frac = p.n / total;
@@ -2467,8 +2352,10 @@ function renderRing() {
 
 function renderProjBar() {
   const proj = activeProject();
-  $("#page-title").textContent = `「${proj.name}」进度看板`;
-  document.title = `${proj.name} · 进度看板`;
+  /* 顶栏项目名 = 项目名 + 分隔符 + 后缀，角括号已按用户要求去掉；
+     分隔符用全角中点「・」(U+30FB)，写法与标签页标题完全一致，两处读起来是同一套命名 */
+  $("#page-title").textContent = `${proj.name} ・ 进度看板`;
+  document.title = `${proj.name} ・ 进度看板`;
   renderMega();
 }
 
@@ -2827,7 +2714,7 @@ function toggleGroup(statusKey, groupName) {
   store.save(data);   // no full re-render → CSS animation plays
 }
 function updateCollapseBtn() {
-  /* 时间轴视图折叠的是整段日期行，只有一个总开关；看板视图按「状态 × 阶段」分组各自记状态 */
+  /* 日期视图折叠的是整段日期行，只有一个总开关；看板视图按「状态 × 阶段」分组各自记状态 */
   if (currentView === "timeline") {
     $("#btn-collapse").textContent = tlFolded ? "全部展开" : "全部折叠";
     return;
@@ -2837,7 +2724,7 @@ function updateCollapseBtn() {
   $("#btn-collapse").textContent = anyExpanded ? "全部折叠" : "全部展开";
 }
 
-/* ================= 时间轴视图：按截止日期纵向排成时间轴 ================= */
+/* ================= 日期视图：按截止日期纵向排成一份日程清单 ================= */
 const fmtDate = ds => {
   const d = new Date(ds);
   return `${d.getMonth() + 1} 月 ${d.getDate()} 日 · 周${WEEK[d.getDay()]}`;
@@ -2936,14 +2823,14 @@ function renderTimeGrid() {
   grid.style.setProperty("--cols", String(TS_COLS));
   grid.style.setProperty("--rows", String(rows));
   grid.innerHTML = cells.join("");
-  /* 点方格 → 跳到下方时间轴里同一天的那一行 */
+  /* 点方格 → 跳到下方日期视图里同一天的那一行 */
   grid.querySelectorAll(".ts-cell[data-date]").forEach(c => c.onclick = () => jumpToDate(c.dataset.date));
   $("#ts-legend").innerHTML =
     CONFIG.priorities.map(p => `<span class="ts-lg"><i style="background:${p.accent}"></i>${p.key}</span>`).join("") +
     `<span class="ts-lg"><i class="ts-lg-today"></i>今天</span><span class="ts-lg ts-hint">点方格跳到下方对应日期</span>`;
 }
 
-/* 点时间块方格：滚到下方时间轴里同一天的行，并高亮闪一下 */
+/* 点时间块方格：滚到下方日期视图里同一天的行，并高亮闪一下 */
 function jumpToDate(ds) {
   const target = [...document.querySelectorAll("#tl-list .tl-row")].find(r => r.dataset.date === ds);
   if (!target) { toast(`${fmtDate(ds)} 没有任务`); return; }
@@ -3220,16 +3107,16 @@ function render() {
   renderRing();
   renderCalendar();   // keep deadline dots & day panel in sync
   renderTimeGrid();
-  /* 时间轴视图：把日历那一格换成时间块网格 */
+  /* 日期视图：把日历那一格换成时间块网格 */
   $("#cal-card").classList.toggle("hidden", currentView === "timeline");
   $("#ts-card").classList.toggle("hidden", currentView !== "timeline");
   $("#view-table").classList.toggle("hidden", currentView !== "table");
   $("#view-board").classList.toggle("hidden", currentView !== "board");
   $("#view-timeline").classList.toggle("hidden", currentView !== "timeline");
-  // 圆形统计在看板 / 时间轴视图显示；备忘录仅任务列表视图
+  // 圆形统计在看板 / 日期视图显示；备忘录仅任务列表视图
   $("#ring-card").classList.toggle("hidden", currentView === "table");
   $("#memo-card").classList.toggle("hidden", currentView !== "table");
-  // 全部折叠 / 全部展开：看板与时间轴视图都可用（任务列表视图用任务管理替代）；新建任务仅任务列表视图显示
+  // 全部折叠 / 全部展开：看板与日期视图都可用（任务列表视图用任务管理替代）；新建任务仅任务列表视图显示
   $("#btn-collapse").classList.toggle("hidden", currentView !== "board" && currentView !== "timeline");
   $("#btn-new").classList.toggle("hidden", currentView !== "table");
   // 任务管理（批量）仅在任务列表视图显示，切到看板时自动退出
@@ -3880,9 +3767,16 @@ function openHelpModal() {
     <div class="help-section">
       <h3>常用操作</h3>
       <ul class="help-list">
-        <li><b>新建任务</b>：点筛选栏右侧的蓝色「新建任务」。</li>
-        <li><b>切换视图</b>：点左侧栏「任务列表 / 看板视图 / 时间轴」。</li>
-        <li><b>推进状态</b>：点任务卡片上的状态标签，按「待开始 → 进行中 → 已完成」依次推进。</li>
+        <li><b>新建任务</b>：点筛选栏最右端的「＋ 新建任务」。<b>该按钮只在「任务列表」视图显示</b>，在看板 / 日期视图下先切回任务列表即可新建。</li>
+        <li><b>打开与删除</b>：点任意视图里的任务卡片打开编辑弹窗，改名称、状态、优先级、所属阶段、截止时间；删除用卡片底部右侧的垃圾桶图标，或选中卡片后按 Delete。</li>
+        <li><b>推进状态</b>：点卡片右上角的圆形状态钮，按「待开始 → 进行中 → 已完成」依次推进；「待修改」点一下回到「已完成」；已完成的任务再点，会询问是否转为「待修改」。</li>
+        <li><b>拖动排序与改状态</b>：任务列表里上下拖动调整顺序；看板视图里把卡片拖到别的状态列即改状态，拖进某个阶段分组还会同时改所属阶段，列内上下拖动调整顺序。</li>
+        <li><b>切换视图</b>：点左侧栏「任务列表 / 看板视图 / 日期视图」。日期视图按截止日期把任务排成一份日程清单，点上方的时间块方格可跳到对应那一天。看板与日期视图的工具条上还有「全部折叠 / 全部展开」，用来收起或展开各列与各日期段里的任务块。</li>
+        <li><b>筛选与搜索</b>：筛选栏按 状态 / 优先级 / 时间（全部 / 7 天内 / 30 天内 / 30 天后）组合筛选，右端搜索框按任务名称搜索；点环形统计的扇区（或右侧对应行）可只看该状态，点筛选提示行的「清除筛选」或环形图中心圆即可复位。视图与筛选条件会记住，刷新后自动恢复。</li>
+        <li><b>任务管理（批量）</b>：任务列表视图点「任务管理」进入批量模式，可一次修改多条任务的状态 / 优先级或批量删除，按钮此时变为「退出管理」。</li>
+        <li><b>备忘录</b>：任务列表视图右侧的「备忘录」用来随手记想法、提醒与参考资料，内容自动保存、随当前项目保存。</li>
+        <li><b>切换项目</b>：点顶栏左端的项目名展开面板，可切换项目、选择任务排序（默认顺序 / 截止早→晚 / 截止晚→早），以及<b>新建 / 重命名 / 删除项目</b>。</li>
+        <li><b>导入任务</b>：左侧栏「导入任务」把大纲或清单文本粘进去（支持 Markdown 与编号列表），可勾选「只保留大标题」「只取冒号前的标题」，每条任务的所属阶段可单独指定。</li>
         <li><b>键盘操作</b>（窗口获得焦点时）：Enter / 空格 打开任务；Delete 删除；Alt + ↑ / ↓ 调整顺序；Esc 关闭弹窗。</li>
       </ul>
     </div>
@@ -4292,12 +4186,11 @@ function runSearch() {
   searchTimer = setTimeout(() => { renderTasks(); renderFilters(); renderTimeGrid(); }, 140);
 }
 
-/* ================= Cult UI「Halo Search」：流动渐变光晕 + 逐字提示 + 清空模糊消散 =================
-   参考 https://www.cult-ui.com/docs/components/halo-search
-   移植它的三层视觉：① 药丸里衬外透出的流动渐变光晕（光晕靠 CSS 关键帧循环，
-   聚焦变亮、清空时切暖色快扫）；② 提示文案逐字错峰淡入，清空后重放一次；
-   ③ 清空时真文本隐去、替身文本从右到左逐字模糊消散。
-   原组件左侧的 WebGL「Warp」着色器头像按需求未移植。 */
+/* ================= Halo Search 交互：逐字提示 + 清空模糊消散 + 回车粒子 =================
+   保留原组件的三层文本动画：① 提示文案逐字错峰淡入，清空后重放一次；
+   ② 清空时真文本隐去、替身文本从右到左逐字模糊消散；
+   ③ 回车提交时文本炸成粒子（canvas 逐帧抖动缩到零）后清空搜索。
+   流动渐变光晕已按用户要求移除，框体只保留 Linear text-input 的静态外观。 */
 (function haloSearch() {
   const root = document.getElementById("halo-search");
   const input = document.getElementById("search");
@@ -4403,6 +4296,99 @@ function runSearch() {
     if (!input.value) { if (prev) playDeletion(prev); else playPlaceholder(); }
   };
 
+  /* ---- 回车提交：文本炸成粒子后清空 ----
+     粒子直接采样「按输入框字体渲出来的文本像素」，所以颜色、字体、字号天然与输入框一致；
+     逐帧加一点随机抖动并整体缩到零，收尾后清空搜索词、重放一次提示文案。 */
+  const textBox = root.querySelector(".halo-text");
+  const dust = document.createElement("canvas");
+  dust.className = "halo-dust";
+  dust.setAttribute("aria-hidden", "true");
+  let dustRaf = 0;
+
+  /* 收尾：撤掉粒子画布、复位状态、清空搜索词 */
+  function endBurst() {
+    cancelAnimationFrame(dustRaf);
+    dustRaf = 0;
+    dust.remove();
+    root.classList.remove("is-clearing");
+    input.value = "";
+    lastValue = "";
+    syncUi();
+    playPlaceholder();
+    runSearch();
+  }
+
+  function submitBurst() {
+    const text = input.value;
+    if (!text || !textBox) return;
+    clearTimeout(ghostTimer);
+    const w = textBox.clientWidth, h = textBox.clientHeight;
+    if (REDUCE || w < 2 || h < 2) { endBurst(); return; }
+
+    const dpr = Math.min(2, window.devicePixelRatio || 1);
+    const cs = getComputedStyle(input);
+    const font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+
+    /* ① 先在离屏画布上按输入框的字体渲一遍，用来逐像素采样 */
+    const off = document.createElement("canvas");
+    off.width = Math.round(w * dpr); off.height = Math.round(h * dpr);
+    const octx = off.getContext("2d");
+    octx.scale(dpr, dpr);
+    octx.font = font; octx.textBaseline = "middle"; octx.fillStyle = cs.color;
+    /* 文本超出框宽时输入框显示的是尾部，这里跟着一起右对齐 */
+    const tw = octx.measureText(text).width;
+    octx.fillText(text, tw > w ? w - tw : 0, h / 2);
+
+    const data = octx.getImageData(0, 0, off.width, off.height).data;
+    const step = Math.max(2, Math.round(2 * dpr));        // 采样步长（设备像素）
+    const parts = [];
+    for (let py = 0; py < off.height && parts.length < 6000; py += step) {
+      for (let px = 0; px < off.width && parts.length < 6000; px += step) {
+        const i = (py * off.width + px) * 4;
+        if (data[i + 3] < 90) continue;                   // 跳过笔画外的透明像素
+        parts.push({
+          x: px / dpr, y: py / dpr, r: (step / dpr) * 1.15,
+          c: `rgb(${data[i]},${data[i + 1]},${data[i + 2]})`,
+          jx: (Math.random() - .5) * 2.6, jy: (Math.random() - .5) * 2.6
+        });
+      }
+    }
+    if (!parts.length) { endBurst(); return; }
+
+    /* ② 把画布盖上输入框文本区，真文本让位给粒子 */
+    dust.width = off.width; dust.height = off.height;
+    dust.style.width = w + "px"; dust.style.height = h + "px";
+    const ctx = dust.getContext("2d");
+    ctx.scale(dpr, dpr);
+    textBox.appendChild(dust);
+    root.classList.add("is-clearing");                    // 播放期间真文本让位给粒子
+
+    let f = 0;
+    const TOTAL = 42;                                     // 约 0.7s
+    (function tick() {
+      f++;
+      const t = f / TOTAL;
+      ctx.clearRect(0, 0, w, h);
+      ctx.globalAlpha = Math.max(0, 1 - t * t);
+      for (const p of parts) {
+        p.x += p.jx * (1 - t * .55);                      // 抖动幅度随进度收小
+        p.y += p.jy * (1 - t * .55);
+        const r = p.r * (1 - t);                          // 颗粒同步缩到零
+        if (r < .35) continue;
+        ctx.fillStyle = p.c;
+        ctx.fillRect(p.x - r / 2, p.y - r / 2, r, r);
+      }
+      if (f < TOTAL) dustRaf = requestAnimationFrame(tick);
+      else endBurst();
+    })();
+  }
+
+  input.addEventListener("keydown", e => {
+    if (e.key !== "Enter") return;
+    e.preventDefault();
+    submitBurst();
+  });
+
   playPlaceholder();
   syncUi();
 })();
@@ -4418,7 +4404,7 @@ window.addEventListener("resize", () => { if (innerWidth > 860) setDrawer(false)
 document.addEventListener("keydown", e => { if (e.key === "Escape") setDrawer(false); });
 
 $("#btn-collapse").onclick = () => {
-  /* 时间轴视图：整段折叠 / 展开，只重绘任务区，不动日历与环形图 */
+  /* 日期视图：整段折叠 / 展开，只重绘任务区，不动日历与环形图 */
   if (currentView === "timeline") {
     tlFolded = !tlFolded;
     animateRows = false;
@@ -4503,7 +4489,7 @@ $("#mega-new").onclick = () => { closeProjMenu(); projectNew(); };
 $("#mega-rename").onclick = () => { closeProjMenu(); projectRename(); };
 $("#mega-del").onclick = () => { closeProjMenu(); projectDelete(); };
 
-/* 大面板开合：悬停展开（留 160ms 宽限，鼠标跨过药丸与面板之间的空隙也不会闪断），
+/* 大面板开合：悬停展开（留 160ms 宽限，鼠标跨过触发区与面板之间的空隙也不会闪断），
    点击项目名切换；点面板以外或按 Esc 收起 */
 const projDrop = $("#proj-drop");
 const projTrigger = $("#proj-trigger");
@@ -4550,66 +4536,6 @@ $("#btn-theme").onclick = () => {
   setTheme(dark ? "light" : "dark");
   render();
 };
-
-/* ---- comp-126 头像上传：点击选图 → 缩放后读成 data URL → 按钮内预览 + 本地持久化 ---- */
-const AVATAR_KEY = "lunwen-avatar-v1";
-const avatarBtn = $("#avatar-btn");
-const avatarFile = $("#avatar-file");
-const avatarImg = $("#avatar-img");
-const avatarPh = $("#avatar-ph");
-const avatarStatus = $("#avatar-status");
-
-function renderAvatar(state) {
-  const has = !!(state && state.url);
-  avatarImg.hidden = !has;
-  avatarPh.hidden = has;
-  if (has) {
-    avatarImg.src = state.url;
-  } else {
-    avatarImg.removeAttribute("src");
-  }
-  avatarBtn.setAttribute("aria-label", has ? "更换头像" : "上传头像");
-  /* 不挂 data-tip：原生选图弹窗关闭后焦点会回到按钮，全局提示系统会据此把提示
-     贴在按钮下方且不再收到 focusout，于是留下一个「悬浮在头像下面」的残留气泡 */
-  avatarStatus.textContent = has ? "已上传图片并生成预览" : "未上传图片";
-}
-function readAvatar() {
-  try { return JSON.parse(localStorage.getItem(AVATAR_KEY) || "null"); } catch (e) { return null; }
-}
-renderAvatar(readAvatar());
-
-avatarBtn.onclick = () => avatarFile.click();
-
-avatarFile.onchange = () => {
-  const f = avatarFile.files && avatarFile.files[0];
-  avatarFile.value = "";                 // 复位，允许再次选择同一张图
-  if (!f) return;
-  const reader = new FileReader();
-  reader.onload = () => {
-    /* 缩到 192px 再转 data URL：手机原图动辄数 MB，直接存会撑爆 localStorage 配额 */
-    const im = new Image();
-    im.onload = () => {
-      const side = 192;
-      const s = Math.min(side / im.width, side / im.height, 1);
-      const cv = document.createElement("canvas");
-      cv.width = Math.max(1, Math.round(im.width * s));
-      cv.height = Math.max(1, Math.round(im.height * s));
-      cv.getContext("2d").drawImage(im, 0, 0, cv.width, cv.height);
-      saveAvatar(cv.toDataURL("image/jpeg", .86), f.name);
-    };
-    /* 解码失败时退回原始 data URL，至少让预览可用 */
-    im.onerror = () => saveAvatar(String(reader.result), f.name);
-    im.src = String(reader.result);
-  };
-  reader.readAsDataURL(f);
-};
-
-function saveAvatar(url, name) {
-  const state = { url, name };
-  try { localStorage.setItem(AVATAR_KEY, JSON.stringify(state)); }
-  catch (e) { toast("头像图片过大，未能保存到本地", true); }
-  renderAvatar(state);
-}
 
 /* Esc 关闭弹窗由上面的弹窗焦点管理器统一处理 */
 
