@@ -231,21 +231,21 @@
   .bi-trash3::before { content: "\f78b"; }
   .bi-x-lg::before { content: "\f659"; }
   .bi-upload::before { content: "\f603"; }
-  /* ============ 明暗模式：深色主题 = Linear 深色版（近黑画布 #010102 + 四级表面阶梯）============ */
+  /* ============ 明暗模式：深色主题 = Linear 深色版（深灰蓝画布 #1a1c20 + 四级表面阶梯）============ */
   :root[data-theme="dark"] {
-    --bg: #010102;
+    --bg: #1a1c20;
     --bg-image: none;
-    --surface: #0f1011;
-    --surface-2: #141516;
-    --surface-3: #18191a;
-    --border: #23252a;
-    --border-strong: #34343a;
-    --border-hover: #3e3e44;
+    --surface: #24272c;
+    --surface-2: #2d3036;
+    --surface-3: #363a41;
+    --border: #414650;
+    --border-strong: #555b66;
+    --border-hover: #656b78;
     --text: #f7f8f8;
     --text-2: #d0d6e0;
-    --text-3: #8a8f98;
-    --text-soft: #62666d;
-    --placeholder: #62666d;
+    --text-3: #939aa3;
+    --text-soft: #82878f;
+    --placeholder: #82878f;
     --cal-muted: rgba(255, 255, 255, .20);
     --scroll-thumb: rgba(255, 255, 255, .16);
     --scroll-thumb-hover: rgba(255, 255, 255, .30);
@@ -270,7 +270,7 @@
     --danger-soft: rgba(229, 72, 77, .16);
 
     --overlay: rgba(0, 0, 0, .68);
-    --toast-bg: #18191a;
+    --toast-bg: #363a41;
     --toast-fg: #f7f8f8;
     --toast-ok: #27a644;
 
@@ -282,8 +282,8 @@
     --ring-stroke: rgba(255, 255, 255, .10);
 
     /* 顶栏：Linear top-nav 深色档（surface-1 半透明 + 轻微模糊） */
-    --nav-bg: color-mix(in srgb, #0f1011 86%, transparent);
-    --nav-border: #23252a;
+    --nav-bg: color-mix(in srgb, #24272c 86%, transparent);
+    --nav-border: #414650;
     --nav-hover: rgba(255, 255, 255, .06);
   }
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -849,7 +849,11 @@
   .cal-day.selected .dots i { background: var(--on-accent) !important; box-shadow: none !important; }
 
   .cal-side { width: 200px; flex: none; border-left: 1px solid var(--border); padding-left: 14px; padding-top: 32px; display: flex; flex-direction: column; justify-content: flex-start; gap: 12px; min-width: 0; }
-  .cs-list { overflow-y: auto; max-height: 158px; display: flex; flex-direction: column; gap: 3px; margin: auto 0; transform: translateY(-10px); }
+  /* 「即将截止」标题放在滚动区之外：滚动条只覆盖条目区，不与标题齐平；
+     有标题时相应压缩条目区高度，让整块高度与之前基本一致 */
+  .cs-wrap { margin: auto 0; transform: translateY(-10px); display: flex; flex-direction: column; gap: 4px; min-width: 0; max-width: 100%; }
+  .cs-list { overflow-y: auto; max-height: 158px; display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+  .cs-wrap:has(.cs-head:not([hidden])) .cs-list { max-height: 132px; }
   .cs-item { display: flex; align-items: center; gap: 7px; padding: 5px 7px; border-radius: var(--r-sm); transition: background .15s ease; min-width: 0; }
   .cs-item:hover { background: var(--surface-2); }
   .cs-item .cs-name { font-size: var(--fs-xs); font-weight: 600; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; color: var(--text); min-width: 0; border: none; background: none; padding: 0; text-align: left; font-family: var(--font); }
@@ -858,6 +862,11 @@
   /* 「即将截止」列表中显示每条任务的截止日期（MM-DD） */
   .cs-item .cs-date { flex: none; font-family: var(--font-num); font-size: var(--fs-2xs); color: var(--text-2); font-variant-numeric: tabular-nums; }
   .cs-empty { font-size: var(--fs-xs); color: var(--text-soft); padding: 14px 8px; text-align: center; line-height: var(--lh-relaxed); }
+  /* 「… · 即将截止」这行小标题：固定在列表上方，条目滚动时它保持不动 */
+  .cs-head {
+    font-size: var(--fs-xs); color: var(--text-soft); text-align: center; line-height: var(--lh-relaxed);
+    padding: 0 8px;
+  }
 
   /* 自定义悬停提示：替代原生 title，边框更细、文字居中、左右留白一致 */
   .tip {
@@ -1884,7 +1893,10 @@
         </div>
         <div class="cal-side">
           <div class="cd-box" id="cd-box"></div>
-          <div class="cs-list" id="cs-list"></div>
+          <div class="cs-wrap">
+            <div class="cs-head" id="cs-head" hidden></div>
+            <div class="cs-list" id="cs-list"></div>
+          </div>
         </div>
       </div>
 
@@ -4102,9 +4114,11 @@ function renderCalendar() {
       <span class="badge" style="background:${tone(statusOf(i.status).color)};color:${toneText(statusOf(i.status).text)}">${statusOf(i.status).label}</span>
     </div>`;
   }).join("");
+  const csHead = $("#cs-head");
+  csHead.textContent = rows && head ? head : "";
+  csHead.hidden = !(rows && head);
   $("#cs-list").innerHTML = rows
-    ? (head ? `<div class="cs-empty">${head}</div>` : "") + rows
-    : `<div class="cs-empty">${head || (calSelected ? "这一天没有截止的任务" : "今天没有截止的任务")}<br/>点击日历上的日期查看</div>`;
+    || `<div class="cs-empty">${head || (calSelected ? "这一天没有截止的任务" : "今天没有截止的任务")}<br/>点击日历上的日期查看</div>`;
   $("#cs-list").querySelectorAll(".js-open").forEach(el =>
     el.onclick = () => openModal(items().find(i => i.id == el.dataset.id)));
 }
